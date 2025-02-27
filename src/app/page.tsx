@@ -78,7 +78,7 @@ export default function Dashboard() {
       <header className="border-b px-6 py-3 flex items-center justify-between">
         <div className="flex items-center">
           <Image
-            src="/images/image1.png"
+            src="/images/logoNU.png"
             alt="Nazarbayev University"
             width={260}
             height={50}

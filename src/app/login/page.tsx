@@ -50,7 +50,7 @@ export default function LoginPage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center bg-cover bg-center"
-      style={{ backgroundImage: "url('/placeholder.svg?height=1080&width=1920')" }}
+      style={{ backgroundImage: "url('/images/backgroundNU.png')" }}
     >
       <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
 
@@ -58,7 +58,7 @@ export default function LoginPage() {
         <div className="flex flex-col md:flex-row">
           <div className="md:w-1/2 p-8 flex items-center justify-center">
             <Image
-              src="/placeholder.svg?height=400&width=400"
+              src="/images/login.svg"
               alt="Login illustration"
               width={400}
               height={400}
@@ -69,7 +69,7 @@ export default function LoginPage() {
           <div className="md:w-1/2 p-8 flex flex-col">
             <div className="mb-8 flex justify-center">
               <Image
-                src="/placeholder.svg?height=80&width=260"
+                src="/images/logoNU.png"
                 alt="Nazarbayev University"
                 width={260}
                 height={80}

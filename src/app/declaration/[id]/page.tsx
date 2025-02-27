@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Settings, User, Truck, FileText, Plus, MoreHorizontal } from "lucide-react";
+import { ArrowLeft, Settings, User, Truck, FileText, Plus, MoreHorizontal, Bell, CircleUserRound} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -61,7 +61,7 @@ export default function DeclarationPage({ params }: { params: { id: string } }) 
       <header className="border-b px-6 py-3 flex items-center justify-between">
         <div className="flex items-center">
           <Image
-            src="/placeholder.svg?height=50&width=260"
+            src="/images/logoNU.png"
             alt="Nazarbayev University"
             width={260}
             height={50}
@@ -71,29 +71,25 @@ export default function DeclarationPage({ params }: { params: { id: string } }) 
         <div className="flex items-center gap-4">
           <div className="relative">
             <div className="absolute -top-1 -right-1 bg-yellow-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-              5
+              2
             </div>
             <Button variant="ghost" size="icon" className="text-gray-600">
-              <Image
-                src="/placeholder.svg?height=24&width=24"
-                alt="Notifications"
-                width={24}
-                height={24}
-              />
+            <Bell className="h-5 w-5" />
             </Button>
           </div>
           <Button variant="ghost" size="icon" className="text-gray-600">
             <Settings className="h-5 w-5" />
           </Button>
-          <div className="h-10 w-10 rounded-full overflow-hidden">
-            <Image
+          {/* <div className="h-10 w-10 rounded-full overflow-hidden"> */}
+            <CircleUserRound className=" object-cover w-3 h-3"/>
+            {/* <Image
               src="/placeholder.svg?height=40&width=40"
               alt="User profile"
               width={40}
               height={40}
               className="h-full w-full object-cover"
-            />
-          </div>
+            /> */}
+          {/* </div> */}
         </div>
       </header>
 

@@ -26,22 +26,26 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationsSidebar } from "@/components/notification-sidebar";
+import { DeclarationResponse, fetchAdminDeclarations } from "@/api/getAdminDeclarations";
 
 export default function Dashboard() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [userData, setUserData] = useState<{ email: string } | null>(null);
   const [notificationsSidebarOpen, setNotificationsSidebarOpen] = useState(false);
+  const [declarations, setDeclarations] = useState<DeclarationResponse[]>([]);
 
   useEffect(() => {
     // Check if user is authenticated
-    const isAuthenticated = localStorage.getItem("isAuthenticated");
-
-    if (!isAuthenticated) {
-      router.push("/login");
-      return;
-    }
-
+    const getDeclarations = async () => {
+      try {
+        const response = await fetchAdminDeclarations();
+        setDeclarations(response);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getDeclarations();
     // Get user data
     const userDataStr = localStorage.getItem("user");
     if (userDataStr) {
@@ -139,7 +143,7 @@ export default function Dashboard() {
         {/* Sidebar */}
         <aside className="w-64 border-r bg-gray-50">
           <div className="p-4 border-b">
-            <h2 className="font-bold text-lg">Sultan Turan</h2>
+            <h2 className="font-bold text-lg">Admin Dashboard</h2>
             <p className="text-sm text-gray-500">sultan.turan@nu.edu.kz</p>
           </div>
           <nav className="p-2">
@@ -233,40 +237,15 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {[
-                  {
-                    id: "00001",
-                    createdBy: "Askar Boranbayev",
-                    createdOn: "04 Sep 2019",
-                    status: "Completed",
-                  },
-                  {
-                    id: "00002",
-                    createdBy: "Azat Akash",
-                    createdOn: "28 May 2019",
-                    status: "Processing",
-                  },
-                  {
-                    id: "00003",
-                    createdBy: "John Doe",
-                    createdOn: "23 Nov 2019",
-                    status: "Rejected",
-                  },
-                  {
-                    id: "00004",
-                    createdBy: "Joe Doe",
-                    createdOn: "05 Feb 2019",
-                    status: "Completed",
-                  },
-                ].map((row) => (
+                {declarations?.map((row) => (
                   <tr
                     key={row.id}
                     className="hover:bg-gray-50 cursor-pointer"
                     onClick={() => router.push(`/declaration/${row.id}`)}
                   >
                     <td className="px-6 py-4 text-sm">{row.id}</td>
-                    <td className="px-6 py-4 text-sm">{row.createdBy}</td>
-                    <td className="px-6 py-4 text-sm">{row.createdOn}</td>
+                    <td className="px-6 py-4 text-sm">{row.manager_id}</td>
+                    <td className="px-6 py-4 text-sm">{row.created_at}</td>
                     <td className="px-6 py-4 text-sm text-right">
                       <Badge
                         className={cn({

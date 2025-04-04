@@ -38,7 +38,7 @@ export default function LoginPage() {
       localStorage.setItem("user", JSON.stringify({ email }));
 
       // Redirect to dashboard
-      router.push("/");
+      router.push("/manager");
     } catch (err) {
       setError("Authentication failed. Please try again.");
       console.error(err);

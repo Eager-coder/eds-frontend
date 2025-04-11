@@ -1,19 +1,23 @@
-import type React from "react";
-import "./globals.css";
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import type React from "react"
+import { Inter } from "next/font/google"
 
-const inter = Inter({ subsets: ["latin"] });
+import "./globals.css"
 
-export const metadata: Metadata = {
-  title: "Nazarbayev University - Initial Declaration",
-  description: "University declaration management system",
-};
+const inter = Inter({ subsets: ["latin"] })
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+
+          {children}
+
+      </body>
     </html>
-  );
+  )
 }
+

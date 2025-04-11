@@ -11,7 +11,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar"
-import { useLanguage } from "./language-provider"
+import { useLanguage } from "../language-provider"
 
 export default function AdminSidebar() {
   const pathname = usePathname()
@@ -20,34 +20,61 @@ export default function AdminSidebar() {
   const navItems = [
     {
       title: t("users"),
-      href: "/users",
+      href: "/admin/users",
       icon: Users,
     },
     {
       title: t("declaration.editor"),
-      href: "/declaration-editor",
+      href: "/admin/declaration-editor",
       icon: FileEdit,
     },
     {
       title: t("initial.declaration"),
-      href: "/initial-declaration",
+      href: "/admin/initial-declaration",
       icon: FileText,
     },
     {
       title: t("ad.hoc"),
-      href: "/ad-hoc",
+      href: "/admin/ad-hoc",
       icon: FileCode,
     },
     {
       title: t("management.plan"),
-      href: "/management-plan",
+      href: "/admin/management-plan",
       icon: BarChart3,
     },
   ]
 
+//   return (
+//     <Sidebar>
+    //   <SidebarHeader className="border-b p-4">
+    //     <div className="flex flex-col">
+    //       <h2 className="font-semibold">{t("admin.panel")}</h2>
+    //       <p className="text-xs text-muted-foreground">admin@example.com</p>
+    //     </div>
+    //   </SidebarHeader>
+    //   <SidebarContent>
+    //     <SidebarMenu>
+    //       {navItems.map((item) => (
+    //         <SidebarMenuItem key={item.href}>
+    //           <SidebarMenuButton asChild isActive={pathname === item.href}>
+    //             <Link href={item.href}>
+    //               <item.icon className="h-4 w-4" />
+    //               <span>{item.title}</span>
+    //             </Link>
+    //           </SidebarMenuButton>
+    //         </SidebarMenuItem>
+    //       ))}
+    //     </SidebarMenu>
+    //   </SidebarContent>
+//     </Sidebar>
+//   )
+// }
+
+
   return (
     <Sidebar>
-      <SidebarHeader className="border-b p-4">
+         <SidebarHeader className="border-b p-4">
         <div className="flex flex-col">
           <h2 className="font-semibold">{t("admin.panel")}</h2>
           <p className="text-xs text-muted-foreground">admin@example.com</p>
@@ -67,7 +94,6 @@ export default function AdminSidebar() {
           ))}
         </SidebarMenu>
       </SidebarContent>
-    </Sidebar>
+      </Sidebar>
   )
 }
-

@@ -13,8 +13,8 @@ export default function AdminLayout({
     <LanguageProvider>
       
         <div className="flex min-h-screen">
-        <SidebarProvider>
-          <AdminSidebar />
+          <SidebarProvider>
+            <AdminSidebar />
           </SidebarProvider>
           <div className="w-full">
             <AdminHeader />

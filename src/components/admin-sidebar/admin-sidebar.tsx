@@ -74,7 +74,7 @@ export default function AdminSidebar() {
 
   return (
     <Sidebar>
-         <SidebarHeader className="border-b p-4">
+         <SidebarHeader className="p-4">
         <div className="flex flex-col">
           <h2 className="font-semibold">{t("admin.panel")}</h2>
           <p className="text-xs text-muted-foreground">admin@example.com</p>
@@ -83,9 +83,9 @@ export default function AdminSidebar() {
       <SidebarContent>
         <SidebarMenu>
           {navItems.map((item) => (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton asChild isActive={pathname === item.href}>
-                <Link href={item.href}>
+            <SidebarMenuItem key={item.href} >
+              <SidebarMenuButton asChild isActive={pathname === item.href} >
+                <Link href={item.href} >
                   <item.icon className="h-4 w-4" />
                   <span>{item.title}</span>
                 </Link>

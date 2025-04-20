@@ -15,7 +15,6 @@ type UserProfileResponse = {
 };
 
 export async function getUserProfile(): Promise<UserProfileResponse> {
-	// return await client.get<UserProfileResponse>('/user/profile');
 	const response = await fetchClient('/user/profile');
 	return await response.json();
 }

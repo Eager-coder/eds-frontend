@@ -15,7 +15,6 @@ export async function fetchClient(url: string, init: RequestInit = {}): Promise<
 	const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? '';
 	const fullUrl = `${API_BASE}${url}`;
 
-	// Build headers
 	const headers = new Headers(init.headers);
 	headers.set('Content-Type', 'application/json');
 	headers.set('Accept', 'application/json');
@@ -26,12 +25,9 @@ export async function fetchClient(url: string, init: RequestInit = {}): Promise<
 		}
 	}
 
-	// First attempt
 	let response = await fetch(fullUrl, { ...init, headers });
 
-	// If unauthorized, try refresh + retry once
-	if (response.status === 401) {
-		// grab refresh token
+	if (response.status === 401 || response.status === 403) {
 		const refreshToken = typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;
 
 		if (!refreshToken) {
@@ -39,7 +35,6 @@ export async function fetchClient(url: string, init: RequestInit = {}): Promise<
 			return response;
 		}
 
-		// Refresh call (no auth header here)
 		const refreshRes = await fetch(`${API_BASE}/auth/refresh-token`, {
 			method: 'POST',
 			headers: {
@@ -48,22 +43,19 @@ export async function fetchClient(url: string, init: RequestInit = {}): Promise<
 			},
 			body: JSON.stringify({ refresh_token: refreshToken })
 		});
-
+		console.log('here   ');
 		if (!refreshRes.ok) {
-			// refresh failed
 			window.location.href = '/login';
 			return response;
 		}
-
+		console.log(await refreshRes.json());
 		const { access_token: newAccess, refresh_token: newRefresh } = await refreshRes.json();
 
-		// store new tokens
 		localStorage.setItem('access_token', newAccess);
 		if (newRefresh) {
 			localStorage.setItem('refresh_token', newRefresh);
 		}
 
-		// retry original with new access token
 		headers.set('Authorization', `Bearer ${newAccess}`);
 		response = await fetch(fullUrl, { ...init, headers });
 	}

@@ -96,7 +96,7 @@ export default function Page() {
 									</td>
 									<td className="border-b px-4 py-3">{`${d.createdBy.firstname} ${d.createdBy.lastname}`}</td>
 									<td className="border-b px-4 py-3">
-										<Link href={`/initial-declarations/${d.id}`}>
+										<Link href={`/admin/initial-declarations/${d.id}`}>
 											<ArrowUpRight className="h-5 w-5 hover:text-blue-600" />
 										</Link>
 									</td>

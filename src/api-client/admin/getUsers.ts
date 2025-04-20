@@ -1,4 +1,4 @@
-import { client } from '@/lib/client';
+import { client, fetchClient } from '@/lib/client';
 
 export type GetUsersResponse = {
 	id: number;
@@ -14,7 +14,7 @@ export type GetUsersResponse = {
 	registrationDate: string;
 };
 
-export async function getUsers() {
-	const response = await client.get<GetUsersResponse[]>('/users');
-	return response.data;
+export async function getUsers(): Promise<GetUsersResponse> {
+	const response = await fetchClient('/users');
+	return await response.json();
 }

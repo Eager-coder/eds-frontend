@@ -50,7 +50,7 @@ export function Sidebar() {
 			</aside>
 		);
 	}
-	console.log('here');
+
 	return (
 		<aside className="min-h-screen min-w-64 border-r border-zinc-200 bg-gray-50">
 			<div className="border-b border-zinc-200 p-4">
@@ -107,6 +107,9 @@ function AdminLinks() {
 function ManagerLinks() {
 	return (
 		<>
+			<NavLink href="/users" icon={FileStack}>
+				Users
+			</NavLink>
 			<NavLink href="/manager/initial-declarations" icon={FileStack}>
 				Initial Declarations
 			</NavLink>

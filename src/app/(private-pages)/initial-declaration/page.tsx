@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,6 +19,9 @@ import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { QuestionDisplay } from '@/components/declaration/QuestionDisplay';
 import { Skeleton } from '@/components/ui/skeleton';
+import Stepper, { StepProps } from '@/components/Stepper';
+import { UIDStatus } from '@/api-client/manager/getUserInitialDeclarations';
+import { formatDetailedDateTime, formatUserName } from '../manager/initial-declarations/[id]/page';
 
 function formatDeclId(id: number | undefined): string {
 	return id?.toString().padStart(5, '0') ?? 'N/A';
@@ -147,7 +150,29 @@ export default function Page() {
 
 		defaultValues: { questions: [] }
 	});
-
+	const [steps, setSteps] = useState<StepProps[]>([
+		{
+			name: UIDStatus.CREATED,
+			description: 'Created',
+			isActive: false,
+			isCompleted: true,
+			isLast: false
+		},
+		{
+			name: UIDStatus.SENT_FOR_APPROVAL,
+			description: 'Sent for approval',
+			isActive: declarationData?.status === UIDStatus.SENT_FOR_APPROVAL,
+			isCompleted: declarationData?.status !== UIDStatus.SENT_FOR_APPROVAL,
+			isLast: false
+		},
+		{
+			name: declarationData?.status.includes('CONFLICT') ? 'CONFLICT' : 'Result',
+			description: 'Reviewed',
+			isActive: false,
+			isCompleted: false,
+			isLast: true
+		}
+	]);
 	useEffect(() => {
 		if (declarationData) {
 			form.reset(mapDataToFormValues(declarationData));
@@ -215,33 +240,95 @@ export default function Page() {
 		);
 	}
 
-	// --- Render Form ---
 	return (
-		<div className="w-full space-y-6 p-6">
-			<h1 className="text-2xl font-bold text-zinc-700">
-				Initial Declaration: {declarationData.declarationName} [DEC-
-				{formatDeclId(declarationData?.declarationId)}]
-			</h1>
-			<p className="text-gray-600">Please answer the following questions carefully.</p>
-
-			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-					{/* Map through questions and render the appropriate component */}
-					{declarationData.questionsWithAnswers.map((question, index) => (
-						<QuestionDisplay key={question.id} question={question} questionIndex={index} />
-					))}
-
-					{form.formState.errors.root?.serverError && (
-						<p className="text-sm font-medium text-red-500">
-							{form.formState.errors.root.serverError.message}
+		<div className="space-y-4 p-4">
+			<Stepper
+				steps={steps}
+				activeStep={steps.findIndex((step) => step.name === declarationData.status)}
+				title="Steps"
+			/>
+			<div className="flex w-full gap-4">
+				<div className="grid h-max min-w-max grid-cols-1 gap-y-5 rounded-sm border border-gray-200 bg-white p-4 shadow-sm">
+					<div>
+						<span className="block text-sm text-gray-500">Number</span>
+						<p className="mt-1 border-b border-gray-300 pb-2 text-base font-semibold text-gray-900">
+							DEC-{formatDeclId(declarationData?.declarationId)}
 						</p>
-					)}
+					</div>
 
-					<Button type="submit" disabled={isSubmitting} className="bg-amber-500 hover:bg-amber-600">
-						{isSubmitting ? 'Submitting...' : 'Submit Declaration'}
-					</Button>
-				</form>
-			</Form>
+					<div>
+						<span className="block text-sm text-gray-500">Created by</span>
+
+						<p className="mt-1 border-b border-gray-300 pb-2 text-base font-semibold text-blue-600">
+							{formatUserName(declarationData?.createdBy)}
+						</p>
+					</div>
+
+					<div>
+						<span className="block text-sm text-gray-500">Responsible</span>
+						<p className="mt-1 border-b border-gray-300 pb-2 text-base font-semibold text-gray-900">
+							{formatUserName(declarationData?.responsible) || 'N/A'}
+						</p>
+					</div>
+
+					<div>
+						<span className="block text-sm text-gray-500">Created on</span>
+						<p className="mt-1 border-b border-gray-300 pb-2 text-base font-semibold text-gray-900">
+							{formatDetailedDateTime(declarationData?.creationDate)}
+						</p>
+					</div>
+
+					<div>
+						<span className="block text-sm text-gray-500">Position/Manager</span>
+						<p className="mt-1 border-b border-gray-300 pb-2 text-base font-semibold text-gray-900">
+							{declarationData?.user?.position || 'N/A'}
+						</p>
+					</div>
+
+					<div>
+						<span className="block text-sm text-gray-500">Department/Office/School</span>
+						<p className="mt-1 border-b border-gray-300 pb-2 text-base font-semibold text-gray-900">
+							{declarationData?.user?.department || 'N/A'}
+						</p>
+					</div>
+
+					<div>
+						<span className="block text-sm text-gray-500">Status</span>
+
+						<p className="mt-1 border-b border-gray-300 pb-2 text-base font-semibold text-gray-900 capitalize last:border-b-0">
+							{steps.find((step) => step.name === declarationData.status)?.description ?? 'N/A'}
+						</p>
+					</div>
+				</div>
+
+				<Form {...form}>
+					<form
+						onSubmit={form.handleSubmit(onSubmit)}
+						className="space-y-8 border border-zinc-200 bg-white p-4"
+					>
+						{declarationData.questionsWithAnswers.map((question, index) => (
+							<QuestionDisplay
+								isReadOnly={declarationData.status !== UIDStatus.CREATED}
+								key={question.id}
+								question={question}
+								questionIndex={index}
+							/>
+						))}
+
+						{form.formState.errors.root?.serverError && (
+							<p className="text-sm font-medium text-red-500">
+								{form.formState.errors.root.serverError.message}
+							</p>
+						)}
+
+						{declarationData.status === UIDStatus.CREATED && (
+							<Button type="submit" disabled={isSubmitting} className="bg-amber-500 hover:bg-amber-600">
+								{isSubmitting ? 'Submitting...' : 'Submit Declaration'}
+							</Button>
+						)}
+					</form>
+				</Form>
+			</div>
 		</div>
 	);
 }

@@ -8,16 +8,18 @@ import { OpenEndedQuestion } from './OpenEndedQuestion';
 interface Props {
 	question: UIDQuestoinWithAnswresDto;
 	questionIndex: number;
+	isReadOnly?: boolean; // <-- Add prop
 }
 
-export function QuestionDisplay({ question, questionIndex }: Props) {
+// Pass isReadOnly down to the specific question component
+export function QuestionDisplay({ question, questionIndex, isReadOnly = false }: Props) {
 	switch (question.questionType) {
 		case 'YES_NO':
-			return <YesNoQuestion question={question} questionIndex={questionIndex} />;
+			return <YesNoQuestion question={question} questionIndex={questionIndex} isReadOnly={isReadOnly} />;
 		case 'AGREE':
-			return <AgreeQuestion question={question} questionIndex={questionIndex} />;
+			return <AgreeQuestion question={question} questionIndex={questionIndex} isReadOnly={isReadOnly} />;
 		case 'OPEN_ENDED':
-			return <OpenEndedQuestion question={question} questionIndex={questionIndex} />;
+			return <OpenEndedQuestion question={question} questionIndex={questionIndex} isReadOnly={isReadOnly} />;
 		default:
 			console.warn(`Unsupported question type: ${question.questionType}`);
 			return <div className="text-red-500">Unsupported question type: {question.questionType}</div>;

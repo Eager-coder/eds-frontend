@@ -36,7 +36,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 		const fetchUserProfile = async () => {
 			try {
 				const response = await getUserProfile();
-				setUser(response.data);
+				setUser(response);
 			} catch (error) {
 				console.error('Failed to fetch user profile:', error);
 				setUser(null);

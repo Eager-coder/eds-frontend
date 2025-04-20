@@ -13,7 +13,8 @@ export default function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const { user } = useUser();
+	const { user, isLoading } = useUser();
+	console.log(user, isLoading);
 	return (
 		<>
 			<Navbar />

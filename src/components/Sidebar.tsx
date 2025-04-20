@@ -35,7 +35,7 @@ export function Sidebar() {
 
 	if (isLoading || !user) {
 		return (
-			<aside className="min-h-screen min-w-64 border-r bg-gray-50 p-4">
+			<aside className="min-h-screen min-w-64 border-r border-zinc-200 bg-gray-50 p-4">
 				{/* Header skeleton */}
 				<div className="mb-6 animate-pulse space-y-2">
 					<div className="h-6 w-32 rounded bg-gray-200"></div>
@@ -50,18 +50,19 @@ export function Sidebar() {
 			</aside>
 		);
 	}
-
+	console.log('here');
 	return (
-		<aside className="min-h-screen min-w-64 border-r bg-gray-50">
-			<div className="border-b p-4">
+		<aside className="min-h-screen min-w-64 border-r border-zinc-200 bg-gray-50">
+			<div className="border-b border-zinc-200 p-4">
 				<h2 className="text-lg font-bold">
 					{user.firstname} {user.lastname}
 				</h2>
 				<p className="text-sm text-gray-500">{user.email}</p>
 			</div>
 			<nav className="p-2">
-				{user.role === 'USER' && <UserLinks />}
 				{user.role === 'SUPER_ADMIN' && <AdminLinks />}
+				{(user.role === 'MANAGER' || user.role === 'SUPER_ADMIN') && <ManagerLinks />}
+				{user.role === 'USER' && <UserLinks />}
 			</nav>
 		</aside>
 	);
@@ -98,6 +99,24 @@ function AdminLinks() {
 
 			<NavLink href="/" icon={FileText}>
 				Management Plan
+			</NavLink>
+		</>
+	);
+}
+
+function ManagerLinks() {
+	return (
+		<>
+			<NavLink href="/manager/initial-declarations" icon={FileStack}>
+				Initial Declarations
+			</NavLink>
+
+			<NavLink href="/" icon={Truck}>
+				Ad hoc Declarations
+			</NavLink>
+
+			<NavLink href="/" icon={FileText}>
+				Management Plans
 			</NavLink>
 		</>
 	);

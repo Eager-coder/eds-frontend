@@ -1,6 +1,7 @@
 'use client';
 
 import { QuestionType } from '@/api-client/admin/initial-declarations/questions/createQuestion';
+import { DeclarationUserDto } from '@/api-client/manager/getUserInitialDeclarations';
 import { fetchClient } from '@/lib/client';
 import { useEffect, useState } from 'react';
 
@@ -69,7 +70,9 @@ export type UIDQuestoinWithAnswresDto = {
 
 export type UIDResponse = {
 	userDeclarationId: number;
-	userId: number;
+	user: DeclarationUserDto;
+	createdBy: DeclarationUserDto;
+	responsible: DeclarationUserDto;
 	userName: string;
 	declarationId: number;
 	declarationName: string;

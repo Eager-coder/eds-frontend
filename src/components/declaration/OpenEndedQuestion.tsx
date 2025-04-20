@@ -11,59 +11,67 @@ import { cn } from '@/lib/utils';
 interface Props {
 	question: UIDQuestoinWithAnswresDto;
 	questionIndex: number;
+	isReadOnly?: boolean; // <-- Add prop
 }
 
-export function OpenEndedQuestion({ question, questionIndex }: Props) {
+export function OpenEndedQuestion({ question, questionIndex, isReadOnly = false }: Props) {
 	const {
 		register,
 		formState: { errors }
 	} = useFormContext();
 
 	return (
-		<FormItem className="space-y-3 rounded-md border p-4">
+		<FormItem className="space-y-3 p-4">
 			<FormLabel
 				className={cn(
 					'text-base font-semibold',
-					question.isRequired && "after:ml-0.5 after:text-red-500 after:content-['*']"
+					!isReadOnly && question.isRequired && "after:ml-0.5 after:text-red-500 after:content-['*']"
 				)}
 			>
 				{question.orderNumber}. {question.description.en} {/* Add localization */}
 				{question.note && <p className="mt-1 text-sm font-normal text-gray-500">{question.note.en}</p>}
 			</FormLabel>
 
-			{/* Render input for each option */}
 			{question.optionsWithAnswers.map((option, optIndex) => {
 				const fieldName = `questions.${questionIndex}.openEndedAnswers.${optIndex}.answer`;
-
-				const error = errors.questions?.[questionIndex]?.openEndedAnswers?.[optIndex]?.answer;
+				const readOnlyValue = isReadOnly ? option.answer : undefined;
+				const error = !isReadOnly
+					? (errors as any)?.questions?.[questionIndex]?.openEndedAnswers?.[optIndex]?.answer
+					: undefined;
 
 				return (
 					<FormItem key={option.id} className="ml-4 space-y-2">
-						{' '}
-						{/* Indent options slightly */}
 						<Label htmlFor={fieldName} className="text-sm font-medium text-gray-700">
-							{option.description.en} {/* Label for the specific input */}
+							{option.description.en} {/* Label for the specific input/display */}
 						</Label>
 						<FormControl>
-							<Input
-								id={fieldName}
-								{...register(fieldName, {
-									// Add conditional required validation if needed based on parent question's isRequired
-									required: question.isRequired ? 'This field is required' : false
-								})}
-								placeholder={`Enter details for ${option.description.en}`}
-								className={error ? 'border-red-500' : ''}
-							/>
+							{isReadOnly ? (
+								<p className="mt-1 min-h-[36px] rounded border bg-gray-50 p-2 text-sm text-gray-800">
+									{readOnlyValue || <span className="text-gray-500 italic">Not provided</span>}
+								</p>
+							) : (
+								<Input
+									id={fieldName}
+									{...register(fieldName, {
+										required: question.isRequired ? 'This field is required' : false
+									})}
+									placeholder={`Enter details for ${option.description.en}`}
+									className={error ? 'border-red-500' : ''}
+									readOnly={isReadOnly} // Make input readOnly visually if needed, though replaced above
+								/>
+							)}
 						</FormControl>
-						<FormMessage>{error?.message}</FormMessage>
-						{/* Render Additional Answers if this option has them */}
+						{!isReadOnly && <FormMessage>{error?.message}</FormMessage>}
+
+						{/* Render Additional Answers */}
 						{option.additionalAnswers && (
 							<AdditionalAnswersSection
 								controlNamePrefix={`questions.${questionIndex}.options.${optIndex}.additionalAnswers`}
 								additionalAnswersData={option.additionalAnswers}
 								allowMultiple={option.multipleAdditionalAnswers}
 								parentOptionId={option.id}
-								// selectedOptionId is not needed for OPEN_ENDED
+								isReadOnly={isReadOnly}
+								initialGroups={isReadOnly ? option.additionalAnswers.answers : undefined}
 							/>
 						)}
 					</FormItem>

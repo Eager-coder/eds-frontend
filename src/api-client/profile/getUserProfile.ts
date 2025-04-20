@@ -1,4 +1,4 @@
-import { client } from '@/lib/client';
+import { client, fetchClient } from '@/lib/client';
 
 type UserProfileResponse = {
 	id: number;
@@ -14,6 +14,8 @@ type UserProfileResponse = {
 	registrationDate: string;
 };
 
-export async function getUserProfile() {
-	return await client.get<UserProfileResponse>('/user/profile');
+export async function getUserProfile(): Promise<UserProfileResponse> {
+	// return await client.get<UserProfileResponse>('/user/profile');
+	const response = await fetchClient('/user/profile');
+	return await response.json();
 }

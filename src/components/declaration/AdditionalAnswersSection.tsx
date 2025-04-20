@@ -4,17 +4,19 @@ import { useFieldArray, useFormContext, Controller } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { FormItem, FormControl, FormMessage, FormLabel } from '@/components/ui/form'; // Assuming FormLabel exists or use Label
+import { FormItem, FormControl, FormMessage, FormLabel } from '@/components/ui/form';
 import { Plus, Trash2 } from 'lucide-react';
 import { UIDAdditionalAnswersDto } from '@/api-client/user/initial-declarations/getUserInitialDeclaration';
 import { cn } from '@/lib/utils';
 
 interface Props {
-	controlNamePrefix: string; // e.g., `questions.${qIndex}.options.${optIndex}.additionalAnswers`
+	controlNamePrefix: string;
 	additionalAnswersData: UIDAdditionalAnswersDto;
 	allowMultiple: boolean;
-	parentOptionId: number; // Needed to ensure we only show this for the *selected* option
-	selectedOptionId?: number | null; // The currently selected optionId for YES_NO questions
+	parentOptionId: number;
+	selectedOptionId?: number | null;
+	isReadOnly?: boolean; // <-- Add isReadOnly prop
+	initialGroups?: any[]; // <-- Add prop to pass fetched answer groups for read-only
 }
 
 export function AdditionalAnswersSection({
@@ -22,15 +24,16 @@ export function AdditionalAnswersSection({
 	additionalAnswersData,
 	allowMultiple,
 	parentOptionId,
-	selectedOptionId
+	selectedOptionId,
+	isReadOnly = false, // Default to false
+	initialGroups = [] // Default to empty array
 }: Props) {
 	const {
 		control,
 		register,
-		formState: { errors }
-	} = useFormContext(); // Use context
-
-	// Name for useFieldArray should point to the array of answer groups
+		formState: { errors },
+		getValues
+	} = useFormContext();
 	const fieldArrayName = `${controlNamePrefix}`;
 
 	const { fields, append, remove } = useFieldArray({
@@ -38,13 +41,14 @@ export function AdditionalAnswersSection({
 		name: fieldArrayName
 	});
 
-	// Only render if this section belongs to the currently selected option (for YES_NO)
-	// For OPEN_ENDED or AGREE, selectedOptionId might not be relevant, assume always show if data exists
 	const isRelevant = selectedOptionId === undefined || selectedOptionId === parentOptionId;
 
-	// Ensure at least one group exists if required and relevant
+	// In read-only mode, use the initialGroups passed from props
+	const displayFields = isReadOnly ? initialGroups : fields;
+
+	// Effect to add default group only runs in editable mode
 	React.useEffect(() => {
-		if (isRelevant && fields.length === 0) {
+		if (!isReadOnly && isRelevant && fields.length === 0 && additionalAnswersData?.questions?.length > 0) {
 			const defaultGroup = {
 				answers: additionalAnswersData.questions.map((q) => ({
 					additionalAnswerId: q.id,
@@ -53,76 +57,97 @@ export function AdditionalAnswersSection({
 			};
 			append(defaultGroup, { shouldFocus: false });
 		}
-	}, [isRelevant, fields.length, append, additionalAnswersData.questions]);
+	}, [isReadOnly, isRelevant, fields.length, append, additionalAnswersData?.questions]);
 
-	if (!isRelevant || !additionalAnswersData?.questions?.length) {
+	if (!isRelevant || !additionalAnswersData?.questions?.length || displayFields.length === 0) {
 		return null;
 	}
 
-	// Function to add a new group of answers
 	const addAnswerGroup = () => {
+		if (isReadOnly) return; // Don't add in read-only
 		const newGroup = {
 			answers: additionalAnswersData.questions.map((q) => ({
 				additionalAnswerId: q.id,
-				answer: '' // Initialize with empty answer
+				answer: ''
 			}))
 		};
 		append(newGroup);
 	};
 
 	return (
-		<div className="mt-4 space-y-6 rounded-md border border-gray-300 bg-gray-50 p-4">
-			<h4 className="font-semibold text-gray-700">Additional Information Required:</h4>
-			{fields.map((groupField, groupIndex) => (
-				<div key={groupField.id} className="relative space-y-4 rounded border border-gray-200 bg-white p-4">
-					{allowMultiple && fields.length > 1 && (
-						<Button
-							type="button"
-							variant="ghost"
-							size="icon"
-							className="absolute top-2 right-2 text-red-500 hover:bg-red-100"
-							onClick={() => remove(groupIndex)}
-						>
-							<Trash2 className="h-4 w-4" />
-							<span className="sr-only">Remove Group</span>
-						</Button>
-					)}
+		<div className="mt-4 space-y-6 rounded-md border border-gray-300 bg-gray-100 p-4">
+			<h4 className="font-semibold text-gray-700">Additional Information Provided:</h4>
+			{displayFields.map((groupField, groupIndex) => (
+				<div
+					key={isReadOnly ? groupIndex : groupField.id}
+					className="relative space-y-4 rounded border border-gray-200 bg-white p-4"
+				>
+					{!isReadOnly &&
+						allowMultiple &&
+						fields.length > 1 && ( // Only show remove button if editable
+							<Button
+								type="button"
+								variant="ghost"
+								size="icon"
+								className="absolute top-2 right-2 text-red-500 hover:bg-red-100"
+								onClick={() => remove(groupIndex)}
+							>
+								<Trash2 className="h-4 w-4" />
+								<span className="sr-only">Remove Group</span>
+							</Button>
+						)}
 					{additionalAnswersData.questions.map((subQuestion, subQuestionIndex) => {
 						const fieldName = `${fieldArrayName}.${groupIndex}.answers.${subQuestionIndex}.answer`;
-						// const error = (errors as any)?.questions?.[/*qIndex*/]?.[/*options*/]?.[/*optIndex*/]?.additionalAnswers?.[groupIndex]?.answers?.[subQuestionIndex]?.answer; // Adjust path based on actual RHF structure
+						// In read-only mode, get the value directly from the initialGroups prop
+						const readOnlyValue = isReadOnly ? groupField?.answers?.[subQuestionIndex]?.answer : undefined;
+						const error = !isReadOnly
+							? (errors as any)?.questions?.additionalAnswers?.[groupIndex]?.answers?.[subQuestionIndex]
+									?.answer
+							: undefined;
 
 						return (
 							<FormItem key={subQuestion.id}>
 								<FormLabel
 									htmlFor={fieldName}
 									className={cn(
-										subQuestion.isRequired && "after:ml-0.5 after:text-red-500 after:content-['*']"
+										!isReadOnly &&
+											subQuestion.isRequired &&
+											"after:ml-0.5 after:text-red-500 after:content-['*']"
 									)}
 								>
-									{subQuestion.description.en} {/* Assuming 'en' for now, add localization later */}
+									{subQuestion.description.en} {/* Add localization */}
 								</FormLabel>
 								<FormControl>
-									<Input
-										id={fieldName}
-										{...register(fieldName, {
-											required: subQuestion.isRequired ? 'This field is required' : false
-										})}
-										placeholder={`Enter ${subQuestion.description.en}`}
-										// className={error ? 'border-red-500' : ''}
-									/>
+									{isReadOnly ? (
+										<p className="mt-1 min-h-[36px] rounded border bg-gray-50 p-2 text-sm text-gray-800">
+											{readOnlyValue || (
+												<span className="text-gray-500 italic">Not provided</span>
+											)}
+										</p>
+									) : (
+										<Input
+											id={fieldName}
+											{...register(fieldName, {
+												required: subQuestion.isRequired ? 'This field is required' : false
+											})}
+											placeholder={`Enter ${subQuestion.description.en}`}
+											className={error ? 'border-red-500' : ''}
+										/>
+									)}
 								</FormControl>
-								{/* <FormMessage>{error?.message}</FormMessage> */}
+								{!isReadOnly && <FormMessage>{error?.message}</FormMessage>}
 							</FormItem>
 						);
 					})}
 				</div>
 			))}
 
-			{allowMultiple && (
-				<Button type="button" variant="outline" size="sm" onClick={addAnswerGroup}>
-					<Plus className="mr-2 h-4 w-4" /> Add Another Set
-				</Button>
-			)}
+			{!isReadOnly &&
+				allowMultiple && ( // Only show add button if editable
+					<Button type="button" variant="outline" size="sm" onClick={addAnswerGroup}>
+						<Plus className="mr-2 h-4 w-4" /> Add Another Set
+					</Button>
+				)}
 		</div>
 	);
 }

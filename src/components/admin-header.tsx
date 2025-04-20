@@ -36,7 +36,7 @@ export default function AdminHeader() {
             priority
             className="h-12 w-auto"
           />
-          <h1 className="text-xl font-semibold">{t("admin.panel")}</h1>
+          {/* <h1 className="text-xl font-semibold">{t("admin.panel")}</h1> */}
         </div>
 
         <Breadcrumb className="hidden md:flex">

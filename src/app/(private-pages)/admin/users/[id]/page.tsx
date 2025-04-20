@@ -97,7 +97,7 @@ export default function UserProfilePage() {
             </div>
           </div>
             <div className="flex justify-end">
-                <Button variant="default" onClick={() => alert("Edit user functionality not implemented")}>
+                <Button variant="outline" onClick={() => alert("Edit user functionality not implemented")}>
                 {t("edit")}
                 </Button>
               </div>

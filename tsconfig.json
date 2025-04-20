@@ -19,9 +19,14 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+        "@/*": ["./src/*"],
+        "@/context/*": ["./src/context/*"], // Adjust if needed
+        "@/components/*": ["./src/components/*"], // Adjust if needed
+        "@/lib/*": ["./src/lib/*"], // Adjust if needed
+        "@/api-client/*": ["./src/api-client/*"], // Adjust if needed
+        "@/schemas/*": ["./src/schemas/*"] // Add this line
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "postcss.config.mjs"],
   "exclude": ["node_modules"]
 }

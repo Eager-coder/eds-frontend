@@ -1,184 +1,261 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { registerUser, RegisterRequest, RegisterResponse } from "@/api/register";
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { registerUser, RegisterRequestDto, RegisterResponseDto } from '@/api-client/auth/register';
+import Image from 'next/image';
+import { useUser } from '@/context/UserContext';
+import Link from 'next/link';
+
+const registerSchema = z
+	.object({
+		email: z.string().email('Please enter a valid email').nonempty('Email is required'),
+		password: z.string().min(8, 'Password should be at least 8 characters').nonempty('Password is required'),
+		confirmPassword: z.string().min(8, 'Password should be at least 8 characters').nonempty('Password is required'),
+		firstname: z.string().nonempty('First name is required'),
+		lastname: z.string().nonempty('Last name is required'),
+		middlename: z.string().optional(),
+		position: z.string().nonempty('Position is required'),
+		department: z.string().nonempty('Department is required')
+	})
+	.refine((data) => data.password === data.confirmPassword, {
+		message: 'Passwords do not match'
+	});
+
+type RegisterSchemaType = z.infer<typeof registerSchema>;
 
 export default function Register() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [middlename, setMiddlename] = useState("");
+	const form = useForm({
+		resolver: zodResolver(registerSchema),
+		defaultValues: {
+			email: '',
+			password: '',
+			confirmPassword: '',
+			firstname: '',
+			lastname: '',
+			middlename: '',
+			position: '',
+			department: ''
+		}
+	});
+	const router = useRouter();
+	const { setUser } = useUser();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const router = useRouter();
+	const onSubmit = async (data: RegisterSchemaType) => {
+		try {
+			const payload: RegisterRequestDto = { ...data, role: 'USER' };
+			const response: RegisterResponseDto = await registerUser(payload);
+			console.log('Registration successful:', response);
+			if (typeof window !== 'undefined') {
+				localStorage.setItem('access_token', response.access_token);
+				localStorage.setItem('refresh_token', response.refresh_token);
+			}
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
+			// Update user context with the user data from response
+			setUser({
+				department: response.user.department,
+				email: response.user.email,
+				firstname: response.user.firstname,
+				id: response.user.id,
+				lastname: response.user.lastname,
+				middlename: response.user.middlename,
+				position: response.user.position,
+				role: response.user.role,
+				isActive: false,
+				isDeleted: false,
+				registrationDate: response.user.registrationDate
+			});
 
-    // Simple validation
-    if (!firstname || !lastname || !email || !password) {
-      setError("Please enter your first name, last name, email, and password");
-      setIsLoading(false);
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      setIsLoading(false);
-      return;
-    }
+			router.push('/');
+		} catch (err) {
+			form.setError('confirmPassword', {
+				type: 'manual',
+				message: 'Registration failed. Please try again.'
+			});
+			console.error(err);
+		}
+	};
 
-    const payload: RegisterRequest = {
-      firstname,
-      lastname,
-      middlename,
-      email,
-      password,
-      role: "USER",
-    };
+	return (
+		<div
+			className="relative flex h-full min-h-screen items-center justify-center bg-cover bg-center"
+			style={{ backgroundImage: "url('/images/backgroundNU.webp')" }}
+		>
+			<div className="absolute inset-0 h-full min-h-screen bg-black/30 backdrop-blur-xs"></div>
 
-    try {
-      const response: RegisterResponse = await registerUser(payload);
-      // Optionally store tokens for later use
-      localStorage.setItem("access_token", response.access_token);
-      localStorage.setItem("refresh_token", response.refresh_token);
-      // Redirect to main page
+			<div className="z-10 w-full max-w-4xl overflow-hidden rounded-lg bg-white shadow-xl">
+				<div className="flex flex-col md:flex-row">
+					<div className="flex items-center justify-center p-8 md:w-1/2">
+						<Image
+							src="/images/login.svg"
+							alt="Register illustration"
+							width={300}
+							height={300}
+							className="h-auto max-w-full"
+						/>
+					</div>
 
-      router.push("/user");
-    } catch (err) {
-      setError("Registration failed. Please try again.");
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+					<div className="flex flex-col p-8 md:w-1/2">
+						<div className="mb-8 flex justify-center">
+							<Image
+								src="/images/logoNU.png"
+								alt="Nazarbayev University"
+								width={260}
+								height={80}
+								className="h-16 w-auto"
+							/>
+						</div>
 
-  return (
-    <div
-      className="min-h-screen flex items-center justify-center bg-cover bg-center"
-      style={{ backgroundImage: "url('/images/backgroundNU.png')" }}
-    >
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
+						<h1 className="mb-6 text-center text-2xl font-bold">Register</h1>
+						<Link href={'/login'} className="block text-center hover:text-orange-500">
+							Sign in
+						</Link>
+						{form.formState.errors.confirmPassword && (
+							<div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-600">
+								{form.formState.errors.confirmPassword.message}
+							</div>
+						)}
 
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl z-10 overflow-hidden">
-        <div className="flex flex-col md:flex-row">
-          <div className="md:w-1/2 p-8 flex items-center justify-center">
-            <Image
-              src="/images/login.svg"
-              alt="Register illustration"
-              width={400}
-              height={400}
-              className="max-w-full h-auto"
-            />
-          </div>
+						<Form {...form}>
+							<form
+								onSubmit={form.handleSubmit(onSubmit, (err: unknown) => {
+									console.error(err);
+								})}
+								className="space-y-4"
+							>
+								<FormField
+									control={form.control}
+									name="firstname"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel htmlFor="firstname">First Name</FormLabel>
+											<FormControl>
+												<Input id="firstname" {...field} placeholder="John" />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
 
-          <div className="md:w-1/2 p-8 flex flex-col">
-            <div className="mb-8 flex justify-center">
-              <Image
-                src="/images/logoNU.png"
-                alt="Nazarbayev University"
-                width={260}
-                height={80}
-                className="h-16 w-auto"
-              />
-            </div>
+								<FormField
+									control={form.control}
+									name="middlename"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel htmlFor="middlename">Middle Name</FormLabel>
+											<FormControl>
+												<Input id="middlename" {...field} placeholder="William" />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
 
-            <h1 className="text-2xl font-bold text-center mb-6">Register</h1>
+								<FormField
+									control={form.control}
+									name="lastname"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel htmlFor="lastname">Last Name</FormLabel>
+											<FormControl>
+												<Input id="lastname" {...field} placeholder="Doe" />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
 
-            {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-md mb-4 text-sm">{error}</div>
-            )}
+								<FormField
+									control={form.control}
+									name="position"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel htmlFor="position">Position</FormLabel>
+											<FormControl>
+												<Input id="position" {...field} placeholder="Manager" />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
 
-            <form onSubmit={handleSubmit} className="space-y-4 p-5">
-              <div className="space-y-2">
-                <Label htmlFor="firstname">First Name</Label>
-                <Input
-                  id="firstname"
-                  type="text"
-                  value={firstname}
-                  onChange={(e) => setFirstname(e.target.value)}
-                  placeholder="John"
-                  required
-                />
-              </div>
+								<FormField
+									control={form.control}
+									name="department"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel htmlFor="department">Department</FormLabel>
+											<FormControl>
+												<Input id="department" {...field} placeholder="SEDS" />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name="email"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel htmlFor="email">Email address</FormLabel>
+											<FormControl>
+												<Input
+													id="email"
+													type="email"
+													{...field}
+													placeholder="your.email@nu.edu.kz"
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
 
-              <div className="space-y-2">
-                <Label htmlFor="middlename">Middle Name</Label>
-                <Input
-                  id="middlename"
-                  type="text"
-                  value={middlename}
-                  onChange={(e) => setMiddlename(e.target.value)}
-                  placeholder="William"
-                />
-              </div>
+								<FormField
+									control={form.control}
+									name="password"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel htmlFor="password">Password</FormLabel>
+											<FormControl>
+												<Input id="password" type="password" {...field} />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
 
-              <div className="space-y-2">
-                <Label htmlFor="lastname">Last Name</Label>
-                <Input
-                  id="lastname"
-                  type="text"
-                  value={lastname}
-                  onChange={(e) => setLastname(e.target.value)}
-                  placeholder="Doe"
-                  required
-                />
-              </div>
+								<FormField
+									control={form.control}
+									name="confirmPassword"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
+											<FormControl>
+												<Input id="confirmPassword" type="password" {...field} />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your.email@nu.edu.kz"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                />
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full bg-amber-500 mt-6 hover:bg-amber-600"
-                disabled={isLoading}
-              >
-                {isLoading ? "Registering..." : "Register"}
-              </Button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+								<Button
+									type="submit"
+									className="mt-6 w-full bg-amber-500 hover:bg-amber-600"
+									disabled={form.formState.isSubmitting}
+								>
+									{form.formState.isSubmitting ? 'Registering...' : 'Register'}
+								</Button>
+							</form>
+						</Form>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 }

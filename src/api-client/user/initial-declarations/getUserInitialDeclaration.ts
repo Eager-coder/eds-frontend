@@ -1,9 +1,9 @@
 'use client';
 
 import { QuestionType } from '@/api-client/admin/initial-declarations/questions/createQuestion';
-import { DeclarationUserDto } from '@/api-client/manager/getUserInitialDeclarations';
+import { DeclarationUserDto, UIDStatus } from '@/api-client/manager/getUserInitialDeclarations';
 import { fetchClient } from '@/lib/client';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 export type UIDAdditionalAnswerDto = {
 	additionalAnswerId: number;
@@ -77,7 +77,7 @@ export type UIDResponse = {
 	declarationId: number;
 	declarationName: string;
 	creationDate: string;
-	status: string;
+	status: UIDStatus;
 	message: string;
 	questionsWithAnswers: UIDQuestoinWithAnswresDto[];
 };
@@ -91,34 +91,12 @@ export const getUserInitialDeclaration = async (userId: number): Promise<UIDResp
 	return await response.json();
 };
 
-export function useUserInitialDeclaration({ userId, enabled }: { userId?: number; enabled: boolean }) {
-	const [data, setData] = useState<UIDResponse | null>(null);
-	const [isLoading, setIsLoading] = useState<boolean>(enabled);
-
-	useEffect(() => {
-		let canceled = false;
-
-		if (!enabled) {
-			setIsLoading(false);
-			return;
-		}
-
-		setIsLoading(true);
-		getUserInitialDeclaration(userId!)
-			.then((res) => {
-				if (!canceled) setData(res);
-			})
-			.catch((err) => {
-				console.error('Failed to fetch user declaration:', err);
-			})
-			.finally(() => {
-				if (!canceled) setIsLoading(false);
-			});
-
-		return () => {
-			canceled = true;
-		};
-	}, [enabled, userId]);
-
-	return { data, isLoading };
+export function useUserInitialDeclaration({ userId, enabled = false }: { userId?: number; enabled: boolean }) {
+	return useQuery({
+		queryKey: ['userInitialDeclaration', userId],
+		queryFn: () => getUserInitialDeclaration(userId!),
+		enabled: enabled && !!userId,
+		staleTime: 5 * 60 * 1000, // 5 minutes
+		gcTime: 10 * 60 * 1000 // 10 minutes
+	});
 }

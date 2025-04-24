@@ -167,7 +167,7 @@ export default function ManagerViewDeclarationPage() {
 					<h2>Next steps:</h2>
 					<Button>Create management plan</Button>
 				</div>
-				<div className="flex gap-4">
+				<div className="flex flex-1 gap-4 min-h-[400px]">
 					<div className="min-w-max rounded-sm border border-gray-200 bg-white p-6 shadow-sm">
 						<div className="grid grid-cols-1 gap-y-5">
 							<div>
@@ -215,7 +215,7 @@ export default function ManagerViewDeclarationPage() {
 							</div>
 						</div>
 					</div>
-					<div className="rounded-sm border border-gray-200 p-4 shadow-sm">
+					<div className="flex-1 min-w-[300px] rounded-sm border border-gray-200 p-4 shadow-sm overflow-auto">
 						{/* Map through questions and render the display component in read-only mode */}
 						{declarationData.questionsWithAnswers.map((question, index) => (
 							<QuestionDisplay

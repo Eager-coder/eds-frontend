@@ -246,7 +246,7 @@ export default function Page() {
 				activeStep={steps.findIndex((step) => step.name === declarationData.status)}
 				title="Steps"
 			/>
-			<div className="flex w-full gap-4">
+			<div className="flex flex-1 gap-4 min-h-[400px]">
 				<div className="grid h-max min-w-max grid-cols-1 gap-y-5 rounded-sm border border-gray-200 bg-white p-4 shadow-sm">
 					<div>
 						<span className="block text-sm text-gray-500">Number</span>
@@ -301,7 +301,7 @@ export default function Page() {
 				</div>
 
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className="border border-zinc-200 bg-white p-4">
+					<form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 min-w-[300px] rounded-sm border border-gray-200 p-4 shadow-sm overflow-auto">
 						{declarationData.questionsWithAnswers.map((question, index) => (
 							<QuestionDisplay
 								isReadOnly={declarationData.status !== UIDStatus.CREATED}

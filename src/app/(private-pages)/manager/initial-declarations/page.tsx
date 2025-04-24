@@ -112,7 +112,7 @@ export default function UserDeclarationsListPage() {
 							declarationsData.map((declaration) => (
 								<TableRow
 									className="cursor-pointer text-zinc-700 hover:bg-zinc-100"
-									onClick={() => router.push(`/manager/initial-declarations/${declaration.id}`)}
+									onClick={() => router.push(`/manager/initial-declarations/${declaration.user.id}`)}
 									key={declaration.id}
 								>
 									{/* Map new data points */}

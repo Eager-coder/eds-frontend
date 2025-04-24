@@ -14,7 +14,6 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import Stepper, { StepProps } from '@/components/Stepper';
 import { formatDeclId, formatDetailedDateTime, formatUserName } from '../../initial-declarations/[id]/page';
 import { UIDStatus } from '@/api-client/manager/getUserInitialDeclarations';
 
@@ -67,29 +66,6 @@ export default function Page() {
 	}
 
 	// Build stepper
-	const steps: StepProps[] = [
-		{
-			name: UIDStatus.CREATED,
-			description: 'Created',
-			isActive: declaration.status === UIDStatus.CREATED,
-			isCompleted: declaration.status !== UIDStatus.CREATED,
-			isLast: false
-		},
-		{
-			name: UIDStatus.SENT_FOR_APPROVAL,
-			description: 'Sent for approval',
-			isActive: declaration.status === UIDStatus.SENT_FOR_APPROVAL,
-			isCompleted: declaration.status !== UIDStatus.SENT_FOR_APPROVAL,
-			isLast: false
-		},
-		{
-			name: declaration.status.includes('CONFLICT') ? 'CONFLICT' : 'Result',
-			description: 'Reviewed',
-			isActive: false,
-			isCompleted: false,
-			isLast: true
-		}
-	];
 
 	// Handle form submission
 	async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -121,7 +97,6 @@ export default function Page() {
 	return (
 		<div className="w-full space-y-4 p-4">
 			{/* Stepper */}
-			<Stepper title="" steps={steps} activeStep={steps.findIndex((s) => s.name === declaration.status)} />
 
 			<div className="flex w-full gap-4">
 				{/* Declaration Info */}

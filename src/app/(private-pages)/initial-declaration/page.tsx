@@ -19,9 +19,9 @@ import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { QuestionDisplay } from '@/components/declaration/QuestionDisplay';
 import { Skeleton } from '@/components/ui/skeleton';
-import Stepper, { StepProps } from '@/components/Stepper';
 import { UIDStatus } from '@/api-client/manager/getUserInitialDeclarations';
 import { formatDetailedDateTime, formatUserName } from '../manager/initial-declarations/[id]/page';
+import { cn } from '@/lib/utils';
 
 function formatDeclId(id: number | undefined): string {
 	return id?.toString().padStart(5, '0') ?? 'N/A';
@@ -82,7 +82,7 @@ const mapFormValuesToPayload = (
 						payloadAnswers.push({
 							optionId: qForm.selectedOptionId!,
 							isAnswered: true,
-							additionalAnswers: qForm.options?.[selectedOptionIndex]?.additionalAnswers // Pass the array of groups
+							additionalAnswers: qForm.options?.[selectedOptionIndex]?.additionalAnswers
 						});
 
 						originalQuestion.optionsWithAnswers.forEach((opt) => {
@@ -149,32 +149,7 @@ export default function Page() {
 
 		defaultValues: { questions: [] }
 	});
-	const [steps, setSteps] = useState<StepProps[]>([
-		{
-			name: UIDStatus.CREATED,
-			description: 'Created',
-			isActive: false,
-			isCompleted: true,
-			isLast: false,
-			hasConflict: false
-		},
-		{
-			name: UIDStatus.SENT_FOR_APPROVAL,
-			description: 'Sent for approval',
-			isActive: declarationData?.status === UIDStatus.SENT_FOR_APPROVAL,
-			isCompleted: declarationData?.status !== UIDStatus.SENT_FOR_APPROVAL,
-			isLast: false,
-			hasConflict: false
-		},
-		{
-			name: declarationData?.status.includes('CONFLICT') ? 'CONFLICT' : 'Result',
-			description: 'Reviewed',
-			isActive: false,
-			isCompleted: false,
-			isLast: true,
-			hasConflict: declarationData?.status.includes('CONFLICT') || false
-		}
-	]);
+
 	useEffect(() => {
 		if (declarationData) {
 			form.reset(mapDataToFormValues(declarationData));
@@ -242,13 +217,78 @@ export default function Page() {
 		);
 	}
 
+	const hasConflict =
+		declarationData.status === UIDStatus.PERCEIVED_CONFLICT || declarationData.status === UIDStatus.ACTUAL_CONFLICT;
+
+	const sentForApprovalStepColor = () => {
+		if (hasConflict) {
+			return 'bg-red-500 text-white';
+		}
+		if (
+			declarationData.status === UIDStatus.SENT_FOR_APPROVAL ||
+			declarationData.status === UIDStatus.NO_CONFLICT
+		) {
+			return 'bg-green-500 text-white';
+		}
+		return 'bg-gray-200 text-black';
+	};
+
+	const completedStepColor = () => {
+		if (hasConflict) return 'bg-red-500 text-white';
+
+		if (declarationData.status === UIDStatus.NO_CONFLICT) {
+			return 'bg-green-500 text-white';
+		}
+
+		return 'bg-gray-200 text-black';
+	};
+
 	return (
 		<div className="w-full flex-1 space-y-4 p-4">
-			<Stepper
-				steps={steps}
-				activeStep={steps.findIndex((step) => step.name === declarationData.status)}
-				title="Steps" hasConflict={false}			/>
-			<div className="flex flex-1 gap-4 min-h-[400px]">
+			<div className="w-full border-none bg-zinc-50">
+				<div className="flex gap-2">
+					{/* Stepper */}
+					<div className="relative flex w-full items-stretch gap-4">
+						<div
+							className={cn(
+								`relative z-10 flex w-full min-w-[200px] flex-col justify-center px-6 py-2`,
+								hasConflict ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
+							)}
+							style={{
+								clipPath:
+									'polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%)'
+							}}
+						>
+							<div className={`text-base font-semibold`}>Created</div>
+						</div>
+						<div
+							className={cn(
+								`relative z-10 flex w-full min-w-[200px] flex-col justify-center px-6 py-2`,
+								sentForApprovalStepColor()
+							)}
+							style={{
+								clipPath:
+									'polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%)'
+							}}
+						>
+							<div className={`text-base font-semibold`}>Sent for Approval</div>
+						</div>
+						<div
+							className={cn(
+								`relative z-10 flex w-full min-w-[200px] flex-col justify-center px-6 py-2`,
+								completedStepColor()
+							)}
+							style={{
+								clipPath:
+									'polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%)'
+							}}
+						>
+							<div className={`text-base font-semibold`}>{hasConflict ? 'Conflict' : 'No Conflict'}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div className="flex min-h-[400px] flex-1 gap-4">
 				<div className="grid h-max min-w-max grid-cols-1 gap-y-5 rounded-sm border border-gray-200 bg-white p-4 shadow-sm">
 					<div>
 						<span className="block text-sm text-gray-500">Number</span>
@@ -297,13 +337,16 @@ export default function Page() {
 						<span className="block text-sm text-gray-500">Status</span>
 
 						<p className="mt-1 border-b border-gray-300 pb-2 text-base font-semibold text-gray-900 capitalize last:border-b-0">
-							{steps.find((step) => step.name === declarationData.status)?.description ?? 'N/A'}
+							{declarationData.status.toLowerCase()}
 						</p>
 					</div>
 				</div>
 
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 min-w-[300px] rounded-sm border border-gray-200 p-4 shadow-sm overflow-auto">
+					<form
+						onSubmit={form.handleSubmit(onSubmit)}
+						className="min-w-[300px] flex-1 overflow-auto rounded-sm border border-gray-200 p-4 shadow-sm"
+					>
 						{declarationData.questionsWithAnswers.map((question, index) => (
 							<QuestionDisplay
 								isReadOnly={declarationData.status !== UIDStatus.CREATED}

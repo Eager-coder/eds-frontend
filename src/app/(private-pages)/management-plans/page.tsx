@@ -34,7 +34,7 @@ export default function Page() {
 	}
 
 	return (
-		<div className="mx-auto w-full max-w-3xl space-y-6 p-6">
+		<div className="w-full max-w-3xl flex-1 space-y-6 p-6">
 			<h1 className="text-2xl font-semibold">My Management Plans</h1>
 
 			{plans.length === 0 ? (

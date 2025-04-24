@@ -41,16 +41,15 @@ export async function getManagementPlans(): Promise<ManagementPlanDto[]> {
 // export const managementPlanByIdKey = (id: number) => ['managementPlan', id] as const;
 
 export function useManagementPlans(
-	id: number,
 	options?: UseQueryOptions<
 		ManagementPlanDto[], // data type
 		Error, // error type
 		ManagementPlanDto[], // select type
-		ReturnType<any> // queryKey tuple
+		string[]
 	>
 ) {
 	return useQuery({
-		queryKey:["managementPlans"],
+		queryKey: ['managementPlans'],
 		queryFn: () => getManagementPlans(),
 		retry: 1,
 		...options

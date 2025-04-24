@@ -14,9 +14,7 @@ export default function Page() {
 		isLoading: plansLoading,
 		isError,
 		error
-	} = user?.id
-		? useManagementPlans(user.id, { enabled: !!user, queryKey: ['managementPlans'] })
-		: { data: [], isLoading: false, isError: false, error: null };
+	} = useManagementPlans({ enabled: !!user, queryKey: ['managementPlans'] });
 
 	// redirect if not logged in
 	useEffect(() => {
@@ -36,8 +34,8 @@ export default function Page() {
 	}
 
 	return (
-		<div className="mx-auto w-full max-w-3xl space-y-6 p-6">
-			<h1 className="text-2xl font-semibold">My Management Plans</h1>
+		<div className="w-full max-w-3xl flex-1 space-y-6 p-6">
+			<h1 className="text-2xl font-semibold">Management Plans</h1>
 
 			{plans.length === 0 ? (
 				<p className="text-gray-600">You have no management plans.</p>
@@ -46,9 +44,9 @@ export default function Page() {
 					{plans.map((plan) => (
 						<li
 							key={plan.id}
-							className="rounded border border-zinc-200 bg-white p-4 transition hover:bg-zinc-50"
+							className="rounded-sm border border-zinc-200 bg-white p-4 transition hover:bg-zinc-50"
 						>
-							<Link href={`/management-plans/${plan.id}`} className="block space-y-1">
+							<Link href={`/manager/management-plans/view/${plan.id}`} className="block space-y-1">
 								<p>
 									<span className="font-medium">Plan ID:</span> {plan.id}
 								</p>

@@ -82,9 +82,10 @@ export type UIDResponse = {
 	questionsWithAnswers: UIDQuestoinWithAnswresDto[];
 };
 
-export const getUserInitialDeclaration = async (userId: number): Promise<UIDResponse> => {
+export const getUserInitialDeclaration = async (userId: number): Promise<UIDResponse | null> => {
 	const response = await fetchClient(`/declaration-answers/${userId}`);
 
+	if (response.status === 404) return null;
 	if (!response.ok) {
 		throw new Error(await response.json());
 	}

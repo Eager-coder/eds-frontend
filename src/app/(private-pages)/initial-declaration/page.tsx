@@ -8,7 +8,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useUser } from '@/context/UserContext';
 import {
 	getUserInitialDeclaration,
-	UIDResponse
+	UIDResponse,
+	useUserInitialDeclaration
 } from '@/api-client/user/initial-declarations/getUserInitialDeclaration';
 import {
 	submitDeclarationAnswers,
@@ -138,9 +139,8 @@ export default function Page() {
 		data: declarationData,
 		isLoading: isDeclarationLoading,
 		error: declarationError
-	} = useQuery<UIDResponse, Error>({
-		queryKey: ['userInitialDeclaration', user?.id],
-		queryFn: () => getUserInitialDeclaration(user!.id!),
+	} = useUserInitialDeclaration({
+		userId: user?.id,
 		enabled: !!user
 	});
 

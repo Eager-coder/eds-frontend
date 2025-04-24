@@ -52,7 +52,6 @@ export function useManagementPlanById(
 	return useQuery({
 		queryKey: managementPlanByIdKey(id),
 		queryFn: () => getManagementPlanById(id),
-		staleTime: 1000 * 60 * 5, // 5 minutes
 		retry: 1,
 		...options
 	});

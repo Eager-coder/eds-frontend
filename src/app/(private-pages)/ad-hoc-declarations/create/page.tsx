@@ -31,12 +31,12 @@ export default function AdHocDeclarationForm() {
 	// Mode: declare or exclude
 	const [mode, setMode] = useState<'declare' | 'exclude' | null>(null);
 
-	// Declare mode state
+	// Declare state
 	const [conflicts, setConflicts] = useState<{ categoryId: number; detail: string }[]>([
 		{ categoryId: 0, detail: '' }
 	]);
 
-	// Exclude mode state
+	// Exclude state
 	const [excludedId, setExcludedId] = useState<number | ''>('');
 	const [excludeReason, setExcludeReason] = useState<string>('');
 
@@ -47,9 +47,17 @@ export default function AdHocDeclarationForm() {
 	const { data: categories, isPending, isError } = useGetAdHocCategories();
 	const { data: statements } = useGetAdHocStatements();
 	const { data: adHocDeclares } = useGetAdHocDeclares(user?.id);
-	const { data: initialDeclaration } = useUserInitialDeclaration({ userId: user?.id!, enabled: !!user });
+	const { data: initialDeclaration } = useUserInitialDeclaration({
+		userId: user?.id,
+		enabled: !!user
+	});
 
-	// Setup agreements array when statements load
+	// Determine availability of previous declarations
+	const hasInitial = (initialDeclaration?.declarationId || 0) > 0;
+	const hasAdHoc = (adHocDeclares ?? []).length > 0;
+	const hasPreviousDeclarations = hasInitial || hasAdHoc;
+
+	// Initialize agreements once statements load
 	useEffect(() => {
 		if (statements) {
 			setAgreements(statements.map(() => false));
@@ -66,16 +74,22 @@ export default function AdHocDeclarationForm() {
 
 	// Build list of previous declarations
 	const previousDeclarations: { type: DecType; id: number; name: string }[] = [
-		{
-			type: 'initial',
-			id: initialDeclaration?.declarationId || 0,
-			name: `DEC-${formatDeclId(initialDeclaration?.declarationId || 0)}`
-		},
-		...(adHocDeclares || []).map((d) => ({
-			type: 'ad-hoc' as DecType,
-			id: d.id || 0,
-			name: `AD-HOC-${formatDeclId(d.id || 0)}`
-		}))
+		...(hasInitial
+			? [
+					{
+						type: 'initial' as DecType,
+						id: initialDeclaration!.declarationId,
+						name: `DEC-${formatDeclId(initialDeclaration!.declarationId)}`
+					}
+				]
+			: []),
+		...(hasAdHoc
+			? adHocDeclares!.map((d) => ({
+					type: 'ad-hoc' as DecType,
+					id: d.id,
+					name: `AD-HOC-${formatDeclId(d.id)}`
+				}))
+			: [])
 	];
 
 	// Form submission
@@ -96,16 +110,12 @@ export default function AdHocDeclarationForm() {
 				await createAdHocDeclare(user.id, payload);
 				router.push('/ad-hoc-declarations');
 			} else if (mode === 'exclude') {
+				if (!hasPreviousDeclarations) return;
+				const entry = previousDeclarations.find((d) => d.id === Number(excludedId))!;
 				const payload: CreateAdHocExcludeRequest = {
 					userId: user.id,
-					initialDeclarationId:
-						previousDeclarations.find((d) => d.id === Number(excludedId))!.type === 'initial'
-							? Number(excludedId)
-							: null,
-					userAdHocDeclareId:
-						previousDeclarations.find((d) => d.id === Number(excludedId))!.type === 'ad-hoc'
-							? Number(excludedId)
-							: null,
+					initialDeclarationId: entry.type === 'initial' ? entry.id : null,
+					userAdHocDeclareId: entry.type === 'ad-hoc' ? entry.id : null,
 					excludeReason,
 					hasAgreedWithStatements: true
 				};
@@ -114,7 +124,7 @@ export default function AdHocDeclarationForm() {
 			}
 		} catch (err) {
 			console.error('Submission error', err);
-			// optionally show toast here
+			// TODO: show a toast or error message
 		}
 	}
 
@@ -124,14 +134,15 @@ export default function AdHocDeclarationForm() {
 		mode === 'declare' &&
 		conflicts.every((c) => c.categoryId > 0 && c.detail.trim() !== '') &&
 		new Set(conflicts.map((c) => c.categoryId)).size === conflicts.length;
-	const excludeValid = mode === 'exclude' && excludedId !== '' && excludeReason.trim() !== '';
+	const excludeValid =
+		mode === 'exclude' && hasPreviousDeclarations && excludedId !== '' && excludeReason.trim() !== '';
 	const canSubmit = allAgreed && (declareValid || excludeValid);
 
 	if (isPending) return <div>Loading categories...</div>;
 	if (isError) return <div>Error loading categories</div>;
 
 	return (
-		<div className="mx-auto w-full max-w-2xl space-y-6 p-6">
+		<div className="w-full max-w-2xl flex-1 space-y-6 p-6">
 			<h1 className="text-2xl font-semibold">Ad Hoc Declaration</h1>
 			<form onSubmit={handleSubmit} className="space-y-6 rounded border border-zinc-200 p-4">
 				{/* Mode selection */}
@@ -144,7 +155,7 @@ export default function AdHocDeclarationForm() {
 							checked={mode === 'declare'}
 							onChange={() => setMode('declare')}
 						/>{' '}
-						<Label htmlFor="mode-declare" className="cursor-pointer">
+						<Label htmlFor="mode-declare" className="cursor-pointer text-base">
 							I have conflict(s) of interest to declare
 						</Label>
 					</div>
@@ -155,10 +166,17 @@ export default function AdHocDeclarationForm() {
 							name="mode"
 							checked={mode === 'exclude'}
 							onChange={() => setMode('exclude')}
+							disabled={!hasPreviousDeclarations}
 						/>{' '}
-						<Label htmlFor="mode-exclude" className="cursor-pointer">
+						<Label
+							htmlFor="mode-exclude"
+							className={`cursor-pointer text-base ${!hasPreviousDeclarations ? 'text-gray-400' : ''}`}
+						>
 							I want to exclude a previous declaration
 						</Label>
+						{!hasPreviousDeclarations && (
+							<p className="mt-1 text-sm text-gray-500">No previous declarations available to exclude.</p>
+						)}
 					</div>
 				</div>
 
@@ -192,7 +210,7 @@ export default function AdHocDeclarationForm() {
 										<option value={0} disabled>
 											Select category…
 										</option>
-										{categories.map((cat) => (
+										{categories!.map((cat) => (
 											<option key={cat.id} value={cat.id} disabled={used.includes(cat.id)}>
 												{cat.description.en}
 											</option>
@@ -253,17 +271,18 @@ export default function AdHocDeclarationForm() {
 				)}
 
 				{/* Agreements */}
-				<div className="space-y-2 border-t border-zinc-200 pt-4">
+				<div className="space-y-4 border-t border-zinc-200 pt-4">
 					{statements?.map((st, i) => (
-						<div key={i} className="flex items-start gap-2">
+						<div key={i} className="flex items-start gap-4">
 							<Checkbox
 								id={`agreement-${i}`}
 								checked={agreements[i]}
+								className="relative top-2"
 								onCheckedChange={(v) =>
 									setAgreements((prev) => prev.map((a, j) => (j === i ? !!v : a)))
 								}
 							/>
-							<Label htmlFor={`agreement-${i}`} className="text-gray-700">
+							<Label htmlFor={`agreement-${i}`} className="text-base text-gray-700">
 								{st.description.en}
 							</Label>
 						</div>

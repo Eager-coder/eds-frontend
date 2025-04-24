@@ -141,8 +141,7 @@ export default function Page() {
 	} = useQuery<UIDResponse, Error>({
 		queryKey: ['userInitialDeclaration', user?.id],
 		queryFn: () => getUserInitialDeclaration(user!.id!),
-		enabled: !!user,
-		staleTime: 5 * 60 * 1000
+		enabled: !!user
 	});
 
 	const form = useForm<DeclarationAnswersFormValues>({

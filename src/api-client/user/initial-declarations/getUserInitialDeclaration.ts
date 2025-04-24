@@ -91,7 +91,7 @@ export const getUserInitialDeclaration = async (userId: number): Promise<UIDResp
 	return await response.json();
 };
 
-export function useUserInitialDeclaration({ userId, enabled }: { userId: number; enabled: boolean }) {
+export function useUserInitialDeclaration({ userId, enabled }: { userId?: number; enabled: boolean }) {
 	const [data, setData] = useState<UIDResponse | null>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(enabled);
 
@@ -104,7 +104,7 @@ export function useUserInitialDeclaration({ userId, enabled }: { userId: number;
 		}
 
 		setIsLoading(true);
-		getUserInitialDeclaration(userId)
+		getUserInitialDeclaration(userId!)
 			.then((res) => {
 				if (!canceled) setData(res);
 			})

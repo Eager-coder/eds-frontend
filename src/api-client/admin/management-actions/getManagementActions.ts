@@ -42,7 +42,6 @@ export function useGetManagementActions(
 	return useQuery({
 		queryKey: MANAGEMENT_ACTIONS_QUERY_KEY,
 		queryFn: getManagementActions,
-		staleTime: 1000 * 60 * 5, // 5 minutes
 		retry: 1,
 		...options
 	});

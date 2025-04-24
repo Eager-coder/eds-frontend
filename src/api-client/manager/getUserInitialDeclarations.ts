@@ -74,7 +74,6 @@ export function useUserInitialDeclarations(
 	>({
 		queryFn: getUserInitialDeclarations,
 		queryKey: USER_INITIAL_DECLARATIONS_LIST_QUERY_KEY,
-		staleTime: 1000 * 60 * 5,
 		retry: 1,
 		...options
 	});

@@ -95,7 +95,7 @@ export default function AdHocDeclarationDetailPage() {
 
 						<div>
 							<h3 className="text-sm font-medium text-gray-500">Status</h3>
-							<p className="mt-1">{getStatusBadge(declaration.status)}</p>
+							<div className="mt-1">{getStatusBadge(declaration.status)}</div>
 						</div>
 
 						<div>

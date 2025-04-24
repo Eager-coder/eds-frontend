@@ -49,7 +49,7 @@ export default function Page() {
 	return (
 		<div className="w-full flex-1 space-y-10 p-6">
 			<div className="mb-6 flex items-center justify-between">
-				<h1 className="text-2xl font-semibold">Ad-hoc declaration</h1>
+				<h1 className="text-2xl font-semibold">My Ad-hoc declarations</h1>
 				<Link
 					href="/ad-hoc-declarations/create"
 					className="flex items-center gap-1 rounded-sm bg-[#DDAF53] px-3 py-1 text-white"

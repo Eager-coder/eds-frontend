@@ -96,7 +96,7 @@ export default function UserDeclarationsListPage() {
 								<tr
 									key={decl.id}
 									className="cursor-pointer text-zinc-700 hover:bg-zinc-100"
-									onClick={() => router.push(`/manager/initial-declarations/${decl.id}`)}
+									onClick={() => router.push(`/manager/initial-declarations/${decl.user.id}`)}
 								>
 									<td className="border-b border-zinc-200 px-4 py-3 font-medium">
 										DEC-{formatDeclId(decl.declarationId)}

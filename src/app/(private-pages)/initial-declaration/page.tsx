@@ -155,21 +155,24 @@ export default function Page() {
 			description: 'Created',
 			isActive: false,
 			isCompleted: true,
-			isLast: false
+			isLast: false,
+			hasConflict: false
 		},
 		{
 			name: UIDStatus.SENT_FOR_APPROVAL,
 			description: 'Sent for approval',
 			isActive: declarationData?.status === UIDStatus.SENT_FOR_APPROVAL,
 			isCompleted: declarationData?.status !== UIDStatus.SENT_FOR_APPROVAL,
-			isLast: false
+			isLast: false,
+			hasConflict: false
 		},
 		{
 			name: declarationData?.status.includes('CONFLICT') ? 'CONFLICT' : 'Result',
 			description: 'Reviewed',
-			isActive: declarationData?.status === UIDStatus.APPROVED,
-			isCompleted: declarationData?.status !== UIDStatus.APPROVED,
-			isLast: true
+			isActive: false,
+			isCompleted: false,
+			isLast: true,
+			hasConflict: declarationData?.status.includes('CONFLICT') || false
 		}
 	]);
 	useEffect(() => {
@@ -244,8 +247,7 @@ export default function Page() {
 			<Stepper
 				steps={steps}
 				activeStep={steps.findIndex((step) => step.name === declarationData.status)}
-				title="Steps"
-			/>
+				title="Steps" hasConflict={false}			/>
 			<div className="flex flex-1 gap-4 min-h-[400px]">
 				<div className="grid h-max min-w-max grid-cols-1 gap-y-5 rounded-sm border border-gray-200 bg-white p-4 shadow-sm">
 					<div>

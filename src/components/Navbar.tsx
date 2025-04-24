@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { Button } from './ui/button';
 import { Bell, CircleUserRound, Settings } from 'lucide-react';
 
@@ -37,9 +38,9 @@ export function Navbar() {
 						<Bell className="h-5 w-5" />
 					</Button>
 				</div>
-				<Button variant="ghost" size="icon" className="text-gray-600">
+				{/* <Button variant="ghost" size="icon" className="text-gray-600">
 					<Settings className="h-5 w-5" />
-				</Button>
+				</Button> */}
 				<div className="group relative">
 					{/* <div className="h-10 w-10 rounded-full overflow-hidden cursor-pointer">
               <Image
@@ -50,18 +51,11 @@ export function Navbar() {
                 className="h-full w-full object-cover"
               />
             </div> */}
-					<CircleUserRound className="h-10 w-10 cursor-pointer object-cover" />
-					<div className="absolute right-0 z-20 mt-2 hidden w-48 overflow-hidden rounded-md bg-white shadow-lg group-hover:block">
-						<div className="border-b px-4 py-2">
-							{/* <p className="text-sm font-medium">{userData?.email}</p> */}
-						</div>
-						<button
-							// onClick={handleLogout}
-							className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
-						>
-							Logout
-						</button>
-					</div>
+			<Link href="/profile">
+			<CircleUserRound size={16} strokeWidth={0.75}  className="h-10 w-10 cursor-pointer object-cover" />
+			</Link>
+					
+					
 				</div>
 			</div>
 		</header>

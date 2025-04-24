@@ -56,7 +56,7 @@ export default function LoginPage() {
 				registrationDate: response.user.registrationDate
 			});
 
-			router.push('/');
+			router.push(`/${response.user.position.toLowerCase()}/initial-declarations`);
 		} catch (err) {
 			form.setError('password', {
 				type: 'manual',

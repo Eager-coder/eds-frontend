@@ -14,7 +14,7 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	const { user, isLoading } = useUser();
-	console.log(user, isLoading);
+
 	return (
 		<>
 			<Navbar />

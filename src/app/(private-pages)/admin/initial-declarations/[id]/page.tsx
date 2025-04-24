@@ -26,13 +26,17 @@ function formatDate(iso: string) {
 import { CreateQuestionDialog } from './CreateQuestionDialog';
 import { Question } from './Question';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { activateInitialDeclaration } from '@/api-client/admin/initial-declarations/activateInitialDeclaration';
+import { ChevronLeft } from 'lucide-react';
+import Link from 'next/link';
 export default function QuestionCreatePage() {
 	const router = useRouter();
 	const params = useParams();
 	const declarationId = Number(params.id);
 
 	const { isLoading: authLoading, user } = useUser();
-	const { isLoading, data: declaration } = useGetInitialDeclarationById(Number(params.id));
+	const { isLoading, data: declaration, refetch } = useGetInitialDeclarationById(Number(params.id));
 	// questions state
 	const [questions, setQuestions] = useState<GetInitialDeclarationByIdResponse['questions']>([]);
 	const [loading, setLoading] = useState(true);
@@ -49,6 +53,11 @@ export default function QuestionCreatePage() {
 		getInidtialDeclaration();
 	}, [getInidtialDeclaration]);
 
+	const handleActivate = async () => {
+		await activateInitialDeclaration(declarationId);
+		await refetch();
+	};
+
 	// auth guard
 	if (authLoading) {
 		return <div className="p-4 text-center">Loading...</div>;
@@ -62,26 +71,33 @@ export default function QuestionCreatePage() {
 	}
 
 	return (
-		<div className="w-full space-y-6 bg-zinc-50 p-6">
-			<div className="space-y-4 rounded-sm border border-zinc-800 bg-white p-4">
-				<h1 className="text-2xl font-bold text-zinc-700">Initial declaration #{declaration?.id}</h1>
-				<h2 className="text-xl font-bold text-zinc-700">Declaration name: {declaration?.name}</h2>
-				<h2 className="text-xl font-bold text-zinc-700">
+		<div className="w-full flex-1 space-y-6 bg-zinc-50 p-6">
+			<div>
+				<Link className="flex" href="/admin/initial-declarations">
+					<ChevronLeft />
+					Back
+				</Link>
+			</div>
+			<div className="space-y-3 border border-zinc-300 bg-white p-4">
+				<h1 className="text-xl font-bold text-zinc-700">Initial declaration #{declaration?.id}</h1>
+				<h2 className="text-lg font-bold text-zinc-700">Declaration name: {declaration?.name}</h2>
+				<h2 className="text-lg font-bold text-zinc-700">
 					Created on: {declaration ? formatDate(declaration.creationDate) : '—'}
 				</h2>
-				<h2 className="text-xl font-bold text-zinc-700">
+				<h2 className="text-lg font-bold text-zinc-700">
 					Created by: {declaration?.createdBy.firstname + ' ' + declaration?.createdBy.lastname}
 				</h2>
-				<h2 className="text-xl font-bold text-zinc-700">
+				<h2 className="text-lg font-bold text-zinc-700">
 					Status:{' '}
 					{declaration?.isActive ? (
-						<Badge className="rounded-md bg-amber-600 px-2 py-0 text-base text-white">Active </Badge>
+						<Badge className="rounded-md bg-[#DDAF53] px-2 py-0 text-base text-white">Active </Badge>
 					) : (
 						<Badge className="rounded-md bg-gray-500 px-2 py-0 text-base text-white">Inactive </Badge>
 					)}
 				</h2>
+				{declaration?.isActive === false && <Button onClick={handleActivate}>Activate</Button>}
 			</div>
-			<div className="space-y-4 border border-gray-700 bg-zinc-100 p-4">
+			<div className="space-y-4 border border-zinc-300 p-4">
 				<div className="flex items-center justify-between">
 					<h2 className="text-xl font-semibold">Questions</h2>
 				</div>

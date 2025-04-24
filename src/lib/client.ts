@@ -48,7 +48,7 @@ export async function fetchClient(url: string, init: RequestInit = {}): Promise<
 			window.location.href = '/login';
 			return response;
 		}
-		console.log(await refreshRes.json());
+
 		const { access_token: newAccess, refresh_token: newRefresh } = await refreshRes.json();
 
 		localStorage.setItem('access_token', newAccess);

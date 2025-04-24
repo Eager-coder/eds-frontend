@@ -91,30 +91,35 @@ export default function UserDeclarationsListPage() {
 
 	// --- Main Content ---
 	return (
-		<div className="w-full space-y-6 p-6">
+		<div className="w-full flex-1 space-y-6 p-6">
 			<h1 className="text-2xl font-bold text-zinc-700">Initial Declarations</h1>
 
-			<div className="overflow-hidden rounded-sm border border-zinc-200">
+			<div className="overflow-hidden border border-zinc-200">
 				<Table>
 					<TableHeader>
 						<TableRow className="border-zinc-200">
 							{/* Updated Headers */}
 							<TableHead className="w-[120px]">Dec. ID</TableHead>
+							<TableHead className="w-[120px]">User</TableHead>
 							<TableHead className="w-[150px]">Status</TableHead>
 							<TableHead className="w-[180px]">Submitted On</TableHead>
 							<TableHead className="w-[200px]">Responsible</TableHead>
-							<TableHead className="w-[80px] text-center">View Link</TableHead>
+							<TableHead className="w-[200px]">Created by</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						{declarationsData && declarationsData.length > 0 ? (
 							declarationsData.map((declaration) => (
-								<TableRow key={declaration.id}>
+								<TableRow
+									className="cursor-pointer text-zinc-700 hover:bg-zinc-100"
+									onClick={() => router.push(`/manager/initial-declarations/${declaration.id}`)}
+									key={declaration.id}
+								>
 									{/* Map new data points */}
 									<TableCell className="font-medium">
 										DEC-{formatDeclId(declaration.declarationId)}
 									</TableCell>
-
+									<TableCell className="font-medium">{formatUserName(declaration.user)}</TableCell>
 									<TableCell>
 										<Badge
 											variant="outline"
@@ -139,14 +144,8 @@ export default function UserDeclarationsListPage() {
 										{/* You could add email or position here too if needed */}
 										{/* e.g., <span className="block text-xs text-gray-500">{declaration.responsible?.email}</span> */}
 									</TableCell>
-									<TableCell className="text-center">
-										{/* Link uses the instance ID (declaration.id) */}
-										<Link
-											className="inline-block text-blue-600 hover:text-blue-800"
-											href={`/manager/initial-declarations/${declaration.id}`}
-										>
-											<ArrowUpRight className="h-5 w-5" />
-										</Link>
+									<TableCell className="font-medium">
+										{formatUserName(declaration.createdBy)}
 									</TableCell>
 								</TableRow>
 							))

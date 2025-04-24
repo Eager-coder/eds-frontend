@@ -42,7 +42,11 @@ export function CreateInitialDeclarationDialog({ onSubmit: onFormSubmit }: Props
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
-				<Button variant="outline" size="sm">
+				<Button
+					variant="outline"
+					className="cursor-pointer rounded-sm border border-zinc-300 hover:bg-[#DDAF53] hover:text-white"
+					size="sm"
+				>
 					<Plus className="mr-2 h-4 w-4" /> New Declaration
 				</Button>
 			</DialogTrigger>

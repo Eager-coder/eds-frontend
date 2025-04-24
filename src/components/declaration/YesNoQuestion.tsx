@@ -10,6 +10,7 @@ import {
 } from '@/api-client/user/initial-declarations/getUserInitialDeclaration';
 import { AdditionalAnswersSection } from './AdditionalAnswersSection';
 import { cn } from '@/lib/utils';
+import { Info } from 'lucide-react';
 
 interface Props {
 	question: UIDQuestoinWithAnswresDto;
@@ -38,7 +39,12 @@ export function YesNoQuestion({ question, questionIndex, isReadOnly = false }: P
 				)}
 			>
 				{question.orderNumber}. {question.description.en} {/* Add localization */}
-				{question.note && <p className="mt-1 text-sm font-normal text-gray-500">{question.note.en}</p>}
+				{question.note && (
+					<div className="mt-1 flex gap-2 rounded bg-sky-50/90 p-2 text-sm font-normal text-gray-700">
+						<Info width={20} height={20} className="text-sky-600" />
+						<p className="w-full flex-1">{question.note.en}</p>
+					</div>
+				)}
 			</FormLabel>
 
 			{isReadOnly ? (

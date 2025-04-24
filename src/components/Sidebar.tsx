@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useUser } from '@/context/UserContext';
-import { FileStack, FileText, Truck, User } from 'lucide-react';
+import { File, FileArchive, FileStack, FileText, Truck, User } from 'lucide-react';
 
 const NavLink = ({
 	href,
@@ -16,7 +16,7 @@ const NavLink = ({
 }) => {
 	const pathname = usePathname();
 
-	const isActive = pathname === href;
+	const isActive = pathname.startsWith(href);
 	return (
 		<Link
 			href={href}
@@ -35,7 +35,7 @@ export function Sidebar() {
 
 	if (isLoading || !user) {
 		return (
-			<aside className="min-h-screen min-w-64 border-r border-zinc-200 bg-gray-50 p-4">
+			<aside className="min-h-screen w-72 max-w-72 min-w-72 flex-1 border-r border-zinc-200 bg-gray-50 p-4">
 				{/* Header skeleton */}
 				<div className="mb-6 animate-pulse space-y-2">
 					<div className="h-6 w-32 rounded bg-gray-200"></div>
@@ -62,7 +62,7 @@ export function Sidebar() {
 			<nav className="p-2">
 				{user.role === 'SUPER_ADMIN' && <AdminLinks />}
 				{(user.role === 'MANAGER' || user.role === 'SUPER_ADMIN') && <ManagerLinks />}
-				{user.role === 'USER' && <UserLinks />}
+				{(user.role === 'MANAGER' || user.role === 'SUPER_ADMIN' || user.role === 'USER') && <UserLinks />}
 			</nav>
 		</aside>
 	);
@@ -70,43 +70,48 @@ export function Sidebar() {
 
 function UserLinks() {
 	return (
-		<>
-			<NavLink href="/initial-declaration" icon={FileStack}>
+		<div className="my-2 rounded-xs border border-zinc-200 p-3">
+			<h2 className="border-b border-zinc-300 pb-3 text-center">User navigation</h2>
+
+			<NavLink href="/initial-declaration" icon={File}>
 				Initial Declaration
 			</NavLink>
 
-			<NavLink href="/ad-hoc-declaration" icon={Truck}>
-				Ad hoc Declaration
+			<NavLink href="/ad-hoc-declarations" icon={FileText}>
+				Ad hoc Declarations
 			</NavLink>
 
-			<NavLink href="/management-plan" icon={FileText}>
-				Management Plan
+			<NavLink href="/management-plans" icon={FileArchive}>
+				Management Plans
 			</NavLink>
-		</>
+		</div>
 	);
 }
 
 function AdminLinks() {
 	return (
-		<>
+		<div className="my-2 rounded-xs border border-zinc-200 p-3">
+			<h2 className="border-b border-zinc-300 pb-3 text-center">Admin navigation</h2>
 			<NavLink href="/admin/initial-declarations" icon={FileStack}>
 				Initial Declaration Builder
 			</NavLink>
 
-			<NavLink href="/" icon={Truck}>
-				Ad hoc Declaration
+			<NavLink href="/admin/ad-hoc-categories" icon={Truck}>
+				Ad-Hoc Categories
 			</NavLink>
 
-			<NavLink href="/" icon={FileText}>
-				Management Plan
+			<NavLink href="/admin/management-actions" icon={FileText}>
+				Management Plan Actions
 			</NavLink>
-		</>
+		</div>
 	);
 }
 
 function ManagerLinks() {
 	return (
-		<>
+		<div className="my-2 rounded-xs border border-zinc-200 p-3">
+			<h2 className="border-b border-zinc-300 pb-3 text-center">Manager navigation</h2>
+
 			<NavLink href="/users" icon={FileStack}>
 				Users
 			</NavLink>
@@ -114,13 +119,13 @@ function ManagerLinks() {
 				Initial Declarations
 			</NavLink>
 
-			<NavLink href="/" icon={Truck}>
+			<NavLink href="/manager/ad-hoc-declarations" icon={Truck}>
 				Ad hoc Declarations
 			</NavLink>
 
-			<NavLink href="/" icon={FileText}>
+			<NavLink href="/manager/management-plans" icon={FileText}>
 				Management Plans
 			</NavLink>
-		</>
+		</div>
 	);
 }

@@ -7,6 +7,7 @@ import { ArrowUpRight } from 'lucide-react';
 
 import { useUser } from '@/context/UserContext';
 import { getUsers, GetUsersResponse } from '@/api-client/admin/getUsers';
+import { Input } from '@/components/ui/input';
 
 export default function Page() {
 	const router = useRouter();
@@ -56,24 +57,24 @@ export default function Page() {
 	}
 
 	return (
-		<div className="p-6">
-			<h1 className="text-2xl font-semibold mb-4">Users</h1>
+		<div className="w-full flex-1 p-6">
+			<h1 className="mb-4 text-2xl font-semibold">Users</h1>
 
 			{/* search + filters */}
-			<div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mb-6">
-				<input
+			<div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:space-x-4">
+				<Input
 					type="text"
 					placeholder="Search…"
 					value={search}
 					onChange={(e) => setSearch(e.target.value)}
-					className="w-full sm:w-1/3 px-3 py-2 border rounded-lg focus:outline-none focus:ring"
+					className="w-full rounded border border-zinc-300 px-3 py-2 focus:ring focus:outline-none sm:w-1/3"
 				/>
 
-				<div className="flex space-x-2 mt-3 sm:mt-0">
+				<div className="mt-3 flex space-x-2 sm:mt-0">
 					<select
 						value={roleFilter}
 						onChange={(e) => setRoleFilter(e.target.value)}
-						className="px-3 py-2 border rounded-lg focus:outline-none focus:ring"
+						className="rounded border border-zinc-300 px-3 py-2 focus:ring focus:outline-none"
 					>
 						<option value="">All Roles</option>
 						{roles.map((r) => (
@@ -86,7 +87,7 @@ export default function Page() {
 					<select
 						value={deptFilter}
 						onChange={(e) => setDeptFilter(e.target.value)}
-						className="px-3 py-2 border rounded-lg focus:outline-none focus:ring"
+						className="rounded border border-zinc-300 px-3 py-2 focus:ring focus:outline-none"
 					>
 						<option value="">All Departments</option>
 						{depts.map((d) => (
@@ -103,20 +104,10 @@ export default function Page() {
 				<table className="min-w-full border-collapse border border-gray-300">
 					<thead>
 						<tr className="bg-gray-50">
-							{[
-								'ID',
-								'First name',
-								'Last name',
-								'Email',
-								'Department',
-								'Position',
-								'Role',
-								'Reg. date',
-								'Profile link'
-							].map((h) => (
+							{['ID', 'Full name', 'Email', 'Department', 'Position', 'Role', 'Reg. date'].map((h) => (
 								<th
 									key={h}
-									className="px-4 py-2 text-left border-b border-gray-200 text-sm font-medium"
+									className="border-b border-gray-200 px-4 py-2 text-left text-sm font-medium"
 								>
 									{h}
 								</th>
@@ -125,29 +116,29 @@ export default function Page() {
 					</thead>
 					<tbody>
 						{filtered.map((u) => (
-							<tr key={u.id} className="hover:bg-gray-50">
-								<td className="px-4 py-3 border-b">{u.id}</td>
-								<td className="px-4 py-3 border-b">{u.firstname}</td>
-								<td className="px-4 py-3 border-b">{u.lastname}</td>
-								<td className="px-4 py-3 border-b">{u.email}</td>
-								<td className="px-4 py-3 border-b">{u.department}</td>
-								<td className="px-4 py-3 border-b">{u.position}</td>
-								<td className="px-4 py-3 border-b">
-									<span className="inline-block px-2 py-1 text-sm border rounded-full">{u.role}</span>
+							<tr
+								key={u.id}
+								onClick={() => router.push(`/users/${u.id}`)}
+								className="cursor-pointer text-zinc-700 hover:bg-gray-50"
+							>
+								<td className="border-b px-4 py-3">{u.id}</td>
+								<td className="border-b px-4 py-3">
+									{u.firstname} {u.lastname}
 								</td>
-								<td className="px-4 py-3 border-b">
+								<td className="border-b px-4 py-3">{u.email}</td>
+								<td className="border-b px-4 py-3">{u.department}</td>
+								<td className="border-b px-4 py-3">{u.position}</td>
+								<td className="border-b px-4 py-3">
+									<span className="inline-block rounded-full border px-2 py-1 text-sm">{u.role}</span>
+								</td>
+								<td className="border-b px-4 py-3">
 									{new Date(u.registrationDate).toLocaleDateString()}
-								</td>
-								<td className="px-4 py-3 border-b">
-									<Link href={`/users/${u.id}`} passHref>
-										<ArrowUpRight className="w-5 h-5 hover:text-blue-600" />
-									</Link>
 								</td>
 							</tr>
 						))}
 						{filtered.length === 0 && (
 							<tr>
-								<td colSpan={9} className="text-center py-6 text-gray-500 italic">
+								<td colSpan={9} className="py-6 text-center text-gray-500 italic">
 									No users to display.
 								</td>
 							</tr>

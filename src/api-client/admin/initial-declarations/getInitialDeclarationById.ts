@@ -4,6 +4,7 @@ import { client } from '@/lib/client';
 import { QuestionType } from './questions/createQuestion';
 import { GetUsersResponse } from '../getUsers';
 import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 export type InitialDeclarationAdditionalOptionDto = {
 	id: number;
@@ -67,30 +68,16 @@ export const getInitialDeclarationById = async (id: number) => {
 	const response = await client.get<GetInitialDeclarationByIdResponse>(`/initial-declarations/${id}`);
 	return response.data;
 };
+// Create query keys for better cache management
+export const initialDeclarationKeys = {
+	all: ['initialDeclaration'] as const,
+	detail: (id: number) => [...initialDeclarationKeys.all, id] as const
+};
 
 export function useGetInitialDeclarationById(id: number) {
-	const [data, setData] = useState<GetInitialDeclarationByIdResponse | null>(null);
-	const [isLoading, setIsLoading] = useState<boolean>(true);
-
-	useEffect(() => {
-		let cancelled = false;
-		setIsLoading(true);
-
-		getInitialDeclarationById(id)
-			.then((res) => {
-				if (!cancelled) setData(res);
-			})
-			.catch((err) => {
-				console.error('Failed to load declaration:', err);
-			})
-			.finally(() => {
-				if (!cancelled) setIsLoading(false);
-			});
-
-		return () => {
-			cancelled = true;
-		};
-	}, [id]);
-
-	return { data, isLoading };
+	return useQuery({
+		queryKey: initialDeclarationKeys.detail(id),
+		queryFn: () => getInitialDeclarationById(id),
+		enabled: !!id // Only run the query if id exists
+	});
 }

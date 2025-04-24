@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -14,6 +14,8 @@ import { QuestionDisplay } from '@/components/declaration/QuestionDisplay';
 import { ViewDeclarationSkeleton } from '@/components/declaration/ViewDeclarationSkeleton';
 import { DeclarationAnswersFormValues, declarationAnswersSchema } from '@/schemas/declarationAnswersSchema';
 import { Button } from '@/components/ui/button';
+import Stepper, { StepProps } from '@/components/Stepper';
+import { UIDStatus } from '@/api-client/manager/getUserInitialDeclarations';
 
 export function formatDeclId(id: number | undefined): string {
 	return id?.toString().padStart(5, '0') ?? 'N/A';
@@ -79,7 +81,29 @@ export default function ManagerViewDeclarationPage() {
 			router.replace('/login');
 		}
 	}, [isUserLoading, managerUser, router]);
-
+	const [steps, setSteps] = useState<StepProps[]>([
+		{
+			name: UIDStatus.CREATED,
+			description: 'Created',
+			isActive: false,
+			isCompleted: true,
+			isLast: false
+		},
+		{
+			name: UIDStatus.SENT_FOR_APPROVAL,
+			description: 'Sent for approval',
+			isActive: declarationData?.status === UIDStatus.SENT_FOR_APPROVAL,
+			isCompleted: declarationData?.status !== UIDStatus.SENT_FOR_APPROVAL,
+			isLast: false
+		},
+		{
+			name: declarationData?.status.includes('CONFLICT') ? 'CONFLICT' : 'Result',
+			description: 'Reviewed',
+			isActive: false,
+			isCompleted: false,
+			isLast: true
+		}
+	]);
 	if (combinedLoading) {
 		return <ViewDeclarationSkeleton />;
 	}
@@ -134,6 +158,15 @@ export default function ManagerViewDeclarationPage() {
 				>
 					<ArrowLeft className="mr-2 h-4 w-4" /> Back to User List
 				</Button>
+				<Stepper
+					steps={steps}
+					activeStep={steps.findIndex((step) => step.name === declarationData.status)}
+					title="Steps"
+				/>
+				<div className="space-y-3 rounded-sm border border-zinc-200 p-4">
+					<h2>Next steps:</h2>
+					<Button>Create management plan</Button>
+				</div>
 				<div className="flex gap-4">
 					<div className="min-w-max rounded-sm border border-gray-200 bg-white p-6 shadow-sm">
 						<div className="grid grid-cols-1 gap-y-5">

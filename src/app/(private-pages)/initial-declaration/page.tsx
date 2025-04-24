@@ -214,7 +214,7 @@ export default function Page() {
 
 	if (isLoading) {
 		return (
-			<div className="w-full space-y-6 p-6">
+			<div className="w-full flex-1 space-y-6 p-6">
 				<Skeleton className="h-8 w-1/2" />
 				<Skeleton className="h-6 w-1/3" />
 				<div className="space-y-4">
@@ -233,7 +233,7 @@ export default function Page() {
 
 	if (!declarationData) {
 		return (
-			<div className="p-4">
+			<div className="flex-1 p-4">
 				<h1 className="text-xl font-semibold italic">No Initial Declaration Found</h1>
 				<p className="text-gray-600">There might not be an active declaration assigned to you at the moment.</p>
 			</div>
@@ -241,7 +241,7 @@ export default function Page() {
 	}
 
 	return (
-		<div className="space-y-4 p-4">
+		<div className="w-full flex-1 space-y-4 p-4">
 			<Stepper
 				steps={steps}
 				activeStep={steps.findIndex((step) => step.name === declarationData.status)}
@@ -302,10 +302,7 @@ export default function Page() {
 				</div>
 
 				<Form {...form}>
-					<form
-						onSubmit={form.handleSubmit(onSubmit)}
-						className="space-y-8 border border-zinc-200 bg-white p-4"
-					>
+					<form onSubmit={form.handleSubmit(onSubmit)} className="border border-zinc-200 bg-white p-4">
 						{declarationData.questionsWithAnswers.map((question, index) => (
 							<QuestionDisplay
 								isReadOnly={declarationData.status !== UIDStatus.CREATED}

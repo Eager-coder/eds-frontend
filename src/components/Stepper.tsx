@@ -16,9 +16,9 @@ const Step: React.FC<StepProps> = ({ name, description, isActive, isCompleted, i
 			<div
 				className={`flex w-full flex-col justify-center px-6 py-2 ${
 					isActive
-						? 'bg-[#DDAF53]'
+						? 'bg-green-600'
 						: isCompleted
-							? 'bg-[#DDAF53] text-zinc-900'
+							? 'bg-green-600 text-zinc-900'
 							: 'border border-slate-200 bg-zinc-200 text-slate-700'
 				} ${!isLast ? 'pr-10' : ''} relative z-10 min-w-[200px]`}
 				style={{
@@ -44,7 +44,7 @@ interface StepperProps {
 
 export default function Stepper({ title, steps, activeStep }: StepperProps) {
 	return (
-		<div className="mx-auto w-full max-w-5xl border-none bg-zinc-50">
+		<div className="w-full max-w-5xl border-none bg-zinc-50">
 			<div className="flex gap-2">
 				{steps.map((step, index) => (
 					<Step

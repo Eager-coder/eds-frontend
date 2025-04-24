@@ -59,21 +59,24 @@ export default function Page() {
 	}
 
 	return (
-		<div className="w-full space-y-8 p-6">
-			<h1 className="text-2xl font-semibold">Declarations</h1>
-			<div className="flex w-full justify-end">
+		<div className="w-full flex-1 space-y-8 p-6">
+			<div className="flex w-full justify-between">
+				<h1 className="text-2xl font-semibold">Initial Declarations</h1>
 				<CreateInitialDeclarationDialog onSubmit={() => getInitialDeclarations().then(setAllDecls)} />
 			</div>
 
 			{/* Active Declarations */}
 			<section>
-				<h2 className="mb-2 text-xl font-medium">Active Declarations</h2>
+				<h2 className="mb-4 text-xl font-medium">Active Declarations</h2>
 				<div className="overflow-x-auto">
-					<table className="min-w-full border-collapse border border-gray-300">
-						<thead className="bg-gray-50">
-							<tr>
+					<table className="min-w-full border-collapse border border-zinc-300">
+						<thead className="bg-zinc-50">
+							<tr className="border-zinc-300">
 								{['ID', 'Type', 'Creation Date', 'Created by', 'Edit Link'].map((h) => (
-									<th key={h} className="border-b px-4 py-2 text-left text-sm font-medium">
+									<th
+										key={h}
+										className="border-b border-zinc-300 px-4 py-2 text-left text-sm font-medium"
+									>
 										{h}
 									</th>
 								))}
@@ -81,21 +84,21 @@ export default function Page() {
 						</thead>
 						<tbody>
 							{activeDecls.length === 0 && (
-								<tr>
+								<tr className="border-zinc-300">
 									<td colSpan={5} className="py-6 text-center text-gray-500 italic">
 										No active declarations.
 									</td>
 								</tr>
 							)}
 							{activeDecls.map((d) => (
-								<tr key={d.id} className="hover:bg-gray-50">
-									<td className="border-b px-4 py-3">{d.id}</td>
-									<td className="border-b px-4 py-3">{d.name}</td>
-									<td className="border-b px-4 py-3">
+								<tr key={d.id} className="border-zinc-300 hover:bg-gray-50">
+									<td className="border-b border-zinc-300 px-4 py-3">{d.id}</td>
+									<td className="border-b border-zinc-300 px-4 py-3">{d.name}</td>
+									<td className="border-b border-zinc-300 px-4 py-3">
 										{new Date(d.creationDate).toLocaleDateString()}
 									</td>
-									<td className="border-b px-4 py-3">{`${d.createdBy.firstname} ${d.createdBy.lastname}`}</td>
-									<td className="border-b px-4 py-3">
+									<td className="border-b border-zinc-300 px-4 py-3">{`${d.createdBy.firstname} ${d.createdBy.lastname}`}</td>
+									<td className="border-b border-zinc-300 px-4 py-3">
 										<Link href={`/admin/initial-declarations/${d.id}`}>
 											<ArrowUpRight className="h-5 w-5 hover:text-blue-600" />
 										</Link>
@@ -109,20 +112,20 @@ export default function Page() {
 
 			{/* Declarations history */}
 			<section>
-				<h2 className="mb-2 text-xl font-medium">Declarations history</h2>
+				<h2 className="mb-4 text-xl font-medium">Declarations history</h2>
 				<div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:space-x-4">
 					<input
 						type="text"
 						placeholder="Search…"
 						value={search}
 						onChange={(e) => setSearch(e.target.value)}
-						className="w-full rounded-lg border px-3 py-2 focus:ring focus:outline-none sm:w-1/4"
+						className="w-full rounded border border-zinc-300 px-3 py-1.5 focus:ring focus:outline-none sm:w-1/4"
 					/>
 					<div className="mt-2 flex space-x-2 sm:mt-0">
 						<select
 							value={typeFilter}
 							onChange={(e) => setTypeFilter(e.target.value)}
-							className="rounded-lg border px-3 py-2 focus:ring focus:outline-none"
+							className="rounded border border-zinc-300 px-3 py-2 focus:ring focus:outline-none"
 						>
 							<option value="">All Types</option>
 							{types.map((t) => (
@@ -134,7 +137,7 @@ export default function Page() {
 						<select
 							value={deprecationSort}
 							onChange={(e) => setDeprecationSort(e.target.value as 'asc' | 'desc' | '')}
-							className="rounded-lg border px-3 py-2 focus:ring focus:outline-none"
+							className="rounded border border-zinc-300 px-3 py-2 focus:ring focus:outline-none"
 						>
 							<option value="">Deprecation date</option>
 							<option value="asc">Oldest first</option>
@@ -143,7 +146,7 @@ export default function Page() {
 						<select
 							value={creationSort}
 							onChange={(e) => setCreationSort(e.target.value as 'asc' | 'desc' | '')}
-							className="rounded-lg border px-3 py-2 focus:ring focus:outline-none"
+							className="rounded border border-zinc-300 px-3 py-2 focus:ring focus:outline-none"
 						>
 							<option value="">Creation date</option>
 							<option value="asc">Oldest first</option>
@@ -153,39 +156,37 @@ export default function Page() {
 				</div>
 
 				<div className="max-h-96 overflow-x-auto overflow-y-auto">
-					<table className="min-w-full border-collapse border border-gray-300">
-						<thead className="bg-gray-50">
-							<tr>
-								{['ID', 'Type', 'Creation Date', 'Created by', 'Close date', 'Close by', 'Link'].map(
-									(h) => (
-										<th key={h} className="border-b px-4 py-2 text-left text-sm font-medium">
-											{h}
-										</th>
-									)
-								)}
+					<table className="min-w-full border-collapse border border-zinc-200">
+						<thead className="border-zinc-300 bg-gray-50">
+							<tr className="border-zinc-300">
+								{['ID', 'Type', 'Creation Date', 'Created by', 'Link'].map((h) => (
+									<th
+										key={h}
+										className="border-b border-zinc-300 px-4 py-2 text-left text-sm font-medium"
+									>
+										{h}
+									</th>
+								))}
 							</tr>
 						</thead>
 						<tbody>
 							{filteredHistory.length === 0 && (
-								<tr>
+								<tr className="border-zinc-300">
 									<td colSpan={7} className="py-6 text-center text-gray-500 italic">
 										No declarations found.
 									</td>
 								</tr>
 							)}
 							{filteredHistory.map((d) => (
-								<tr key={d.id} className="hover:bg-gray-50">
-									<td className="border-b px-4 py-3">{d.id}</td>
-									<td className="border-b px-4 py-3">{d.name}</td>
-									<td className="border-b px-4 py-3">
+								<tr key={d.id} className="border-zinc-300 hover:bg-gray-50">
+									<td className="border-b border-zinc-300 px-4 py-3">{d.id}</td>
+									<td className="border-b border-zinc-300 px-4 py-3">{d.name}</td>
+									<td className="border-b border-zinc-300 px-4 py-3">
 										{new Date(d.creationDate).toLocaleDateString()}
 									</td>
-									<td className="border-b px-4 py-3">{`${d.createdBy.firstname} ${d.createdBy.lastname}`}</td>
-									<td className="border-b px-4 py-3">
-										{new Date(d.activationDate).toLocaleDateString()}
-									</td>
-									<td className="border-b px-4 py-3">{`${d.createdBy.firstname} ${d.createdBy.lastname}`}</td>
-									<td className="border-b px-4 py-3">
+									<td className="border-b border-zinc-300 px-4 py-3">{`${d.createdBy.firstname} ${d.createdBy.lastname}`}</td>
+
+									<td className="border-b border-zinc-300 px-4 py-3">
 										<Link href={`/admin/initial-declarations/${d.id}`}>
 											<ArrowUpRight className="h-5 w-5 hover:text-blue-600" />
 										</Link>

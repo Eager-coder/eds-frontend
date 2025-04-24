@@ -9,14 +9,17 @@ export function Navbar() {
 	return (
 		<header className="flex items-center justify-between border-b border-zinc-200 px-6 py-3">
 			<div className="flex items-center">
+			<Link href="/">
 				<Image
 					src="/images/logoNU.png"
 					alt="Nazarbayev University"
 					width={260}
 					priority
 					height={50}
-					className="h-12 w-auto"
+					// className="h-12 w-auto cursor-pointer"
+					className="h-12 w-auto cursor-pointer"
 				/>
+			</Link>	
 			</div>
 			<div className="flex items-center gap-4">
 				<div className="relative">

@@ -21,6 +21,7 @@ import {
 import { cn } from '@/lib/utils';
 import { NotificationsSidebar } from '@/components/notification-sidebar';
 import { useUser } from '@/context/UserContext';
+import Home from './home/page';
 
 export default function Dashboard() {
 	const router = useRouter();
@@ -64,8 +65,8 @@ export default function Dashboard() {
 	}
 
 	return (
-		<div className="flex min-h-screen flex-col">
-			<div className="flex flex-1"></div>
+		<div className="flex min-h-screen w-full flex-1 flex-col">
+			<div className="flex flex-1"><Home/></div>
 			<NotificationsSidebar open={notificationsSidebarOpen} onOpenChange={setNotificationsSidebarOpen} />
 		</div>
 	);

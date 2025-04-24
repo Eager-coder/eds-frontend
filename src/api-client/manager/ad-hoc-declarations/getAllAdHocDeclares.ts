@@ -12,7 +12,7 @@ export const getAllAdHocDeclares = async (): Promise<AdHocDeclareDto[]> => {
 
 export const allAdHocDeclaresKeys = ['allAdHocDeclaresKeys'];
 
-export function useGetAdHocDeclares(enabled: boolean) {
+export function useGetAllAdHocDeclares(enabled: boolean) {
 	return useQuery({
 		queryKey: allAdHocDeclaresKeys,
 		queryFn: getAllAdHocDeclares,

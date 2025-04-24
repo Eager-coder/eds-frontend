@@ -1,7 +1,5 @@
 'use client';
-
 import { useGetAdHocDeclare, AdHocStatus } from '@/api-client/user/ad-hoc-declarations/getAdHocDeclare';
-
 import { useUser } from '@/context/UserContext';
 import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -14,17 +12,7 @@ import { ArrowLeft, Check, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { updateAdHocDeclare } from '@/api-client/manager/ad-hoc-declarations/updateAdHocDeclare';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Drawer, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-
-// Status steps in order
-const statusSteps = [
-	AdHocStatus.CREATED,
-	AdHocStatus.SENT_FOR_APPROVAL,
-	AdHocStatus.ACTUAL_CONFLICT, // These three represent the same step
-	AdHocStatus.PERCEIVED_CONFLICT, // in the visual progress bar
-	AdHocStatus.NO_CONFLICT
-];
 
 export default function AdHocDeclarationManagerPage() {
 	const router = useRouter();
@@ -136,7 +124,7 @@ export default function AdHocDeclarationManagerPage() {
 		<div className="w-full flex-1 p-6">
 			{/* Back button */}
 			<Link
-				href="/ad-hoc-declarations/manager"
+				href="/manager/ad-hoc-declarations"
 				className="mb-4 inline-flex items-center text-blue-600 hover:underline"
 			>
 				<ArrowLeft className="mr-1" size={16} />
@@ -216,7 +204,7 @@ export default function AdHocDeclarationManagerPage() {
 
 						<div>
 							<h3 className="text-sm font-medium text-gray-500">Status</h3>
-							<p className="mt-1">{getStatusBadge(declaration.status)}</p>
+							<div className="mt-1">{getStatusBadge(declaration.status)}</div>
 						</div>
 
 						<div>

@@ -3,7 +3,6 @@ import { fetchClient } from '@/lib/client';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 
 export const getAdHocExclude = async (id: number): Promise<AdHocExcludeDto> => {
-	//TODO
 	const response = await fetchClient(`/adhoc-declarations/exclude/${id}`);
 	if (!response.ok) {
 		throw new Error(await response.text());

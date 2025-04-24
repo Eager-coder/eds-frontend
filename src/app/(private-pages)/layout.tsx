@@ -7,6 +7,7 @@ import { Navbar } from '@/components/Navbar';
 import { useUser } from '@/context/UserContext';
 import Link from 'next/link';
 import { Sidebar } from '@/components/Sidebar';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function RootLayout({
 	children
@@ -20,7 +21,19 @@ export default function RootLayout({
 			<Navbar />
 			<div className="flex">
 				<Sidebar />
-				{children}
+
+				{isLoading ? (
+					<div className="w-full space-y-3 p-6">
+						<Skeleton className="h-8 w-full" />
+						<Skeleton className="h-8 w-full" />
+						<Skeleton className="h-8 w-full" />
+						<Skeleton className="h-8 w-full" />
+						<Skeleton className="h-8 w-full" />
+						<Skeleton className="h-8 w-full" />
+					</div>
+				) : (
+					children
+				)}
 			</div>
 		</>
 	);

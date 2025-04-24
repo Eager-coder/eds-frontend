@@ -225,6 +225,7 @@ export default function ManagerViewDeclarationPage() {
 								isReadOnly={true} // <-- Set to read-only
 							/>
 						))}
+						<Button>Accept</Button>
 					</div>
 				</div>
 			</div>

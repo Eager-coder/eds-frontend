@@ -167,8 +167,8 @@ export default function Page() {
 		{
 			name: declarationData?.status.includes('CONFLICT') ? 'CONFLICT' : 'Result',
 			description: 'Reviewed',
-			isActive: false,
-			isCompleted: false,
+			isActive: declarationData?.status === UIDStatus.APPROVED,
+			isCompleted: declarationData?.status !== UIDStatus.APPROVED,
 			isLast: true
 		}
 	]);

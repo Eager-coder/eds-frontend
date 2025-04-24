@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { AlertCircle, ArrowLeft } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
 import {
 	useUserInitialDeclaration,
@@ -16,6 +16,9 @@ import { DeclarationAnswersFormValues, declarationAnswersSchema } from '@/schema
 import { Button } from '@/components/ui/button';
 import Stepper, { StepProps } from '@/components/Stepper';
 import { UIDStatus } from '@/api-client/manager/getUserInitialDeclarations';
+import { cn } from '@/lib/utils';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { updateUIDStatus } from '@/api-client/manager/initial-declarations/updateUIDStatus';
 
 export function formatDeclId(id: number | undefined): string {
 	return id?.toString().padStart(5, '0') ?? 'N/A';
@@ -61,7 +64,11 @@ export default function ManagerViewDeclarationPage() {
 	const { isLoading: isUserLoading, user: managerUser } = useUser();
 
 	// Fetch data using the manager-specific hook
-	const { data: declarationData, isLoading: isDeclarationLoading } = useUserInitialDeclaration({
+	const {
+		data: declarationData,
+		isLoading: isDeclarationLoading,
+		refetch
+	} = useUserInitialDeclaration({
 		userId: targetUserId!,
 		enabled:
 			!isUserLoading &&
@@ -76,34 +83,20 @@ export default function ManagerViewDeclarationPage() {
 
 	const combinedLoading = isUserLoading || (!!targetUserId && isDeclarationLoading);
 
+	const handleStatusUpdate = async () => {
+		if (declarationData && statusToUpdate) {
+			await updateUIDStatus(declarationData.declarationId, statusToUpdate);
+			await refetch();
+		}
+	};
+
 	React.useEffect(() => {
 		if (!isUserLoading && !managerUser) {
 			router.replace('/login');
 		}
 	}, [isUserLoading, managerUser, router]);
-	const [steps, setSteps] = useState<StepProps[]>([
-		{
-			name: UIDStatus.CREATED,
-			description: 'Created',
-			isActive: false,
-			isCompleted: true,
-			isLast: false
-		},
-		{
-			name: UIDStatus.SENT_FOR_APPROVAL,
-			description: 'Sent for approval',
-			isActive: declarationData?.status === UIDStatus.SENT_FOR_APPROVAL,
-			isCompleted: declarationData?.status !== UIDStatus.SENT_FOR_APPROVAL,
-			isLast: false
-		},
-		{
-			name: declarationData?.status.includes('CONFLICT') ? 'CONFLICT' : 'Result',
-			description: 'Reviewed',
-			isActive: false,
-			isCompleted: false,
-			isLast: true
-		}
-	]);
+	const [statusToUpdate, setStatusToUpdate] = useState<UIDStatus | null>(null);
+
 	if (combinedLoading) {
 		return <ViewDeclarationSkeleton />;
 	}
@@ -146,10 +139,35 @@ export default function ManagerViewDeclarationPage() {
 			</div>
 		);
 	}
+	const hasConflict =
+		declarationData.status === UIDStatus.PERCEIVED_CONFLICT || declarationData.status === UIDStatus.ACTUAL_CONFLICT;
+
+	const sentForApprovalStepColor = () => {
+		if (hasConflict) {
+			return 'bg-red-500 text-white';
+		}
+		if (
+			declarationData.status === UIDStatus.SENT_FOR_APPROVAL ||
+			declarationData.status === UIDStatus.NO_CONFLICT
+		) {
+			return 'bg-green-500 text-white';
+		}
+		return 'bg-gray-200 text-black';
+	};
+
+	const completedStepColor = () => {
+		if (hasConflict) return 'bg-red-500 text-white';
+
+		if (declarationData.status === UIDStatus.NO_CONFLICT) {
+			return 'bg-green-500 text-white';
+		}
+
+		return 'bg-gray-200 text-black';
+	};
 
 	return (
 		<FormProvider {...formMethods}>
-			<div className="w-full space-y-6 p-6">
+			<div className="w-full flex-1 space-y-6 p-6">
 				<Button
 					variant="outline"
 					size="sm"
@@ -158,16 +176,64 @@ export default function ManagerViewDeclarationPage() {
 				>
 					<ArrowLeft className="mr-2 h-4 w-4" /> Back to User List
 				</Button>
-				<Stepper
-					steps={steps}
-					activeStep={steps.findIndex((step) => step.name === declarationData.status)}
-					title="Steps"
-				/>
-				<div className="space-y-3 rounded-sm border border-zinc-200 p-4">
-					<h2>Next steps:</h2>
-					<Button>Create management plan</Button>
+
+				<div className="w-full max-w-5xl border-none bg-zinc-50">
+					<div className="flex gap-2">
+						<div className="relative flex w-full items-stretch">
+							<div
+								className={cn(
+									`relative z-10 flex w-full min-w-[200px] flex-col justify-center px-6 py-2`,
+									hasConflict ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
+								)}
+								style={{
+									clipPath:
+										'polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%)'
+								}}
+							>
+								<div className={`text-base font-semibold`}>Created</div>
+							</div>
+							<div
+								className={cn(
+									`relative z-10 flex w-full min-w-[200px] flex-col justify-center px-6 py-2`,
+									sentForApprovalStepColor()
+								)}
+								style={{
+									clipPath:
+										'polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%)'
+								}}
+							>
+								<div className={`text-base font-semibold`}>Sent for Approval</div>
+							</div>
+							<div
+								className={cn(
+									`relative z-10 flex w-full min-w-[200px] flex-col justify-center px-6 py-2`,
+									completedStepColor()
+								)}
+								style={{
+									clipPath:
+										'polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%)'
+								}}
+							>
+								<div className={`text-base font-semibold`}>
+									{hasConflict ? 'Conflict' : 'No Conflict'}
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
-				<div className="flex flex-1 gap-4 min-h-[400px]">
+				{hasConflict && (
+					<div className="space-y-3 rounded-sm border border-zinc-200 p-4">
+						<h2>Next steps:</h2>
+						<Link
+							href={`/manager/management-plans/create?decId=${declarationData.declarationId}`}
+							className="rounded-sm bg-[#DDAF53] px-3 py-2 text-white hover:bg-amber-700"
+						>
+							Create management plan
+						</Link>
+					</div>
+				)}
+
+				<div className="flex min-h-[400px] flex-1 gap-4">
 					<div className="min-w-max rounded-sm border border-gray-200 bg-white p-6 shadow-sm">
 						<div className="grid grid-cols-1 gap-y-5">
 							<div>
@@ -215,7 +281,7 @@ export default function ManagerViewDeclarationPage() {
 							</div>
 						</div>
 					</div>
-					<div className="flex-1 min-w-[300px] rounded-sm border border-gray-200 p-4 shadow-sm overflow-auto">
+					<div className="min-w-[300px] flex-1 overflow-auto rounded-sm border border-gray-200 p-4 shadow-sm">
 						{/* Map through questions and render the display component in read-only mode */}
 						{declarationData.questionsWithAnswers.map((question, index) => (
 							<QuestionDisplay
@@ -225,7 +291,42 @@ export default function ManagerViewDeclarationPage() {
 								isReadOnly={true} // <-- Set to read-only
 							/>
 						))}
-						<Button>Accept</Button>
+
+						{declarationData.status === UIDStatus.SENT_FOR_APPROVAL ? (
+							<div className="mt-3 bg-amber-50 p-4">
+								<h2 className="mb-2 flex gap-2 text-xl font-semibold">
+									<AlertCircle className="text-orange-500" strokeWidth={3} />
+									Action Required: Select status
+								</h2>
+								<Select
+									value={statusToUpdate || ''}
+									onValueChange={(val: UIDStatus) => setStatusToUpdate(val)}
+								>
+									<SelectTrigger id="" className="w-72 rounded-sm border border-zinc-300 bg-white">
+										<SelectValue placeholder="Select" />
+									</SelectTrigger>
+									<SelectContent className="border border-zinc-300 bg-white">
+										{[
+											UIDStatus.NO_CONFLICT,
+											UIDStatus.PERCEIVED_CONFLICT,
+											UIDStatus.ACTUAL_CONFLICT
+										].map((type) => (
+											<SelectItem key={type} value={type}>
+												{type.replace(/_/g, ' ').toLowerCase()}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+								<Button
+									onClick={handleStatusUpdate}
+									type="submit"
+									disabled={!statusToUpdate}
+									className="mt-4 w-24 bg-[#DDAF53] text-white hover:bg-amber-600"
+								>
+									Save
+								</Button>
+							</div>
+						) : null}
 					</div>
 				</div>
 			</div>

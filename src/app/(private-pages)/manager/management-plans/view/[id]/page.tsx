@@ -6,7 +6,6 @@ import { useUser } from '@/context/UserContext';
 import { useGetManagementActions } from '@/api-client/admin/management-actions/getManagementActions';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import Stepper, { StepProps } from '@/components/Stepper';
 import { formatDetailedDateTime, formatUserName } from '../../../initial-declarations/[id]/page';
 import {
 	ManagementPlanStatus,
@@ -43,40 +42,10 @@ export default function Page() {
 		return <div className="p-6 text-center text-red-500">Management plan not found.</div>;
 	}
 
-	const steps: StepProps[] = [
-		{
-			name: ManagementPlanStatus.CREATED,
-			description: 'Created',
-			isActive: managementPlan.status === ManagementPlanStatus.CREATED,
-			isCompleted: managementPlan.status !== ManagementPlanStatus.CREATED,
-			isLast: false
-		},
-		{
-			name: ManagementPlanStatus.SENT_FOR_CONFIRMATION,
-			description: 'Sent for confirmation',
-			isActive: managementPlan.status === ManagementPlanStatus.SENT_FOR_CONFIRMATION,
-			isCompleted: managementPlan.status !== ManagementPlanStatus.SENT_FOR_CONFIRMATION,
-			isLast: false
-		},
-		{
-			name: managementPlan.status,
-			description: 'Finalized',
-			isActive:
-				managementPlan.status === ManagementPlanStatus.AGREED ||
-				managementPlan.status === ManagementPlanStatus.REFUSED,
-			isCompleted:
-				managementPlan.status !== ManagementPlanStatus.AGREED &&
-				managementPlan.status !== ManagementPlanStatus.REFUSED,
-			isLast: true
-		}
-	];
-
 	const selectedAction = managementActions.find((a) => a.id === managementPlan.actionId);
 
 	return (
 		<div className="w-full space-y-6 p-4">
-			<Stepper title="" steps={steps} activeStep={steps.findIndex((s) => s.name === managementPlan.status)} />
-
 			<div className="flex w-full gap-6">
 				{/* Plan Info */}
 				<div className="min-w-max rounded-sm border border-zinc-200 bg-white p-6 shadow-sm">

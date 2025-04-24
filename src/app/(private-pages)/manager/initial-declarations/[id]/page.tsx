@@ -14,11 +14,12 @@ import { QuestionDisplay } from '@/components/declaration/QuestionDisplay';
 import { ViewDeclarationSkeleton } from '@/components/declaration/ViewDeclarationSkeleton';
 import { DeclarationAnswersFormValues, declarationAnswersSchema } from '@/schemas/declarationAnswersSchema';
 import { Button } from '@/components/ui/button';
-import Stepper, { StepProps } from '@/components/Stepper';
 import { UIDStatus } from '@/api-client/manager/getUserInitialDeclarations';
 import { cn } from '@/lib/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { updateUIDStatus } from '@/api-client/manager/initial-declarations/updateUIDStatus';
+import { useGetUIDManagementPlans } from '@/api-client/common/getUIDManagementPlans';
+import { Badge } from '@/components/ui/badge';
 
 export function formatDeclId(id: number | undefined): string {
 	return id?.toString().padStart(5, '0') ?? 'N/A';
@@ -75,6 +76,10 @@ export default function ManagerViewDeclarationPage() {
 			!!managerUser &&
 			(managerUser.role === 'MANAGER' || managerUser.role === 'ADMIN' || managerUser.role === 'SUPER_ADMIN') &&
 			!!targetUserId
+	});
+
+	const { data: managementPlans } = useGetUIDManagementPlans(declarationData?.declarationId, {
+		enabled: Boolean(declarationData?.declarationId)
 	});
 
 	const formMethods = useForm<DeclarationAnswersFormValues>({
@@ -172,14 +177,14 @@ export default function ManagerViewDeclarationPage() {
 					variant="outline"
 					size="sm"
 					onClick={() => router.back()}
-					className="mb-4 cursor-pointer border-zinc-200"
+					className="mb-4 cursor-pointer rounded-sm border-zinc-200"
 				>
 					<ArrowLeft className="mr-2 h-4 w-4" /> Back to User List
 				</Button>
 
 				<div className="w-full max-w-5xl border-none bg-zinc-50">
 					<div className="flex gap-2">
-						<div className="relative flex w-full items-stretch">
+						<div className="relative flex w-full items-stretch gap-4">
 							<div
 								className={cn(
 									`relative z-10 flex w-full min-w-[200px] flex-col justify-center px-6 py-2`,
@@ -221,7 +226,7 @@ export default function ManagerViewDeclarationPage() {
 						</div>
 					</div>
 				</div>
-				{hasConflict && (
+				{hasConflict && !managementPlans?.length && (
 					<div className="space-y-3 rounded-sm border border-zinc-200 p-4">
 						<h2>Next steps:</h2>
 						<Link
@@ -230,6 +235,24 @@ export default function ManagerViewDeclarationPage() {
 						>
 							Create management plan
 						</Link>
+					</div>
+				)}
+
+				{managementPlans && (
+					<div className="rounded-sm border border-zinc-200 p-4">
+						<h3>Management plans:</h3>
+						{managementPlans?.map((mp, index) => (
+							<ol key={mp.id} className="my-2">
+								<Link
+									href={`/manager/management-plans/view/${mp.id}`}
+									className="flex gap-2 font-semibold text-amber-700 hover:underline"
+								>
+									<span>Management plan MP-{formatDeclId(mp.id)}</span>
+
+									<Badge className="bg-gray-700 text-white">{mp.status.toLocaleLowerCase()}</Badge>
+								</Link>
+							</ol>
+						))}
 					</div>
 				)}
 

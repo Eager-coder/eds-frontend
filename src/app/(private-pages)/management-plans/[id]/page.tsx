@@ -6,7 +6,6 @@ import { useUser } from '@/context/UserContext';
 import { useGetManagementActions } from '@/api-client/admin/management-actions/getManagementActions';
 import { useManagementPlanById } from '@/api-client/manager/management-plans/getManagementPlanById';
 import { ManagementPlanStatus } from '@/api-client/manager/management-plans/getManagementPlanById';
-import Stepper, { StepProps } from '@/components/Stepper';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -41,30 +40,6 @@ export default function Page() {
 	if (!plan) {
 		return <div className="p-6 text-center text-red-500">Management plan not found.</div>;
 	}
-	// stepper
-	const steps: StepProps[] = [
-		{
-			name: ManagementPlanStatus.CREATED,
-			description: 'Created',
-			isActive: plan.status === ManagementPlanStatus.CREATED,
-			isCompleted: plan.status !== ManagementPlanStatus.CREATED,
-			isLast: false
-		},
-		{
-			name: ManagementPlanStatus.SENT_FOR_CONFIRMATION,
-			description: 'Sent for confirmation',
-			isActive: plan.status === ManagementPlanStatus.SENT_FOR_CONFIRMATION,
-			isCompleted: plan.status !== ManagementPlanStatus.SENT_FOR_CONFIRMATION,
-			isLast: false
-		},
-		{
-			name: plan.status,
-			description: 'Finalized',
-			isActive: plan.status === ManagementPlanStatus.AGREED || plan.status === ManagementPlanStatus.REFUSED,
-			isCompleted: plan.status !== ManagementPlanStatus.AGREED && plan.status !== ManagementPlanStatus.REFUSED,
-			isLast: true
-		}
-	];
 
 	// lookup selected action
 	const selectedAction = managementActions.find((a) => a.id === plan.actionId);
@@ -104,9 +79,8 @@ export default function Page() {
 	}
 
 	return (
-		<div className="w-full space-y-6 p-4">
+		<div className="w-full flex-1 space-y-6 p-4">
 			{/* Stepper */}
-			<Stepper title="" steps={steps} activeStep={steps.findIndex((s) => s.name === plan.status)} />
 
 			<div className="flex w-full gap-6">
 				{/* Left metadata panel */}
@@ -169,11 +143,15 @@ export default function Page() {
 
 						<div>
 							<span className="block text-sm text-gray-500">Notification date</span>
-							<p className="mt-1 text-gray-900">{formatDetailedDateTime(plan.notificationDate)}</p>
+							<p className="mt-1 text-gray-900">
+								{plan.notificationDate ? formatDetailedDateTime(plan.notificationDate) : '-'}
+							</p>
 						</div>
 						<div>
 							<span className="block text-sm text-gray-500">Confirmation date</span>
-							<p className="mt-1 text-gray-900">{formatDetailedDateTime(plan.confirmationDate)}</p>
+							<p className="mt-1 text-gray-900">
+								{plan.confirmationDate ? formatDetailedDateTime(plan.confirmationDate) : '-'}
+							</p>
 						</div>
 					</div>
 

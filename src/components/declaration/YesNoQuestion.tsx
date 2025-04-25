@@ -123,6 +123,7 @@ export function YesNoQuestion({ question, questionIndex, isReadOnly = false }: P
 						parentOptionId={option.id}
 						selectedOptionId={displaySelectedOptionId} // Use the determined selected ID
 						isReadOnly={isReadOnly}
+						additionalAnswerDescription={option.additionalAnswerDescription}
 						// Pass the fetched additional answers for this option for read-only display
 						initialGroups={isReadOnly ? option.additionalAnswers.answers : undefined}
 					/>

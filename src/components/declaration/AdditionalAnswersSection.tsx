@@ -17,6 +17,11 @@ interface Props {
 	selectedOptionId?: number | null;
 	isReadOnly?: boolean; // <-- Add isReadOnly prop
 	initialGroups?: any[]; // <-- Add prop to pass fetched answer groups for read-only
+	additionalAnswerDescription: {
+		ru: string;
+		en: string;
+		kz: string;
+	};
 }
 
 export function AdditionalAnswersSection({
@@ -26,7 +31,8 @@ export function AdditionalAnswersSection({
 	parentOptionId,
 	selectedOptionId,
 	isReadOnly = false, // Default to false
-	initialGroups = [] // Default to empty array
+	initialGroups = [], // Default to empty array]
+	additionalAnswerDescription
 }: Props) {
 	const {
 		control,
@@ -76,7 +82,7 @@ export function AdditionalAnswersSection({
 
 	return (
 		<div className="mt-4 space-y-6 rounded-md border border-gray-300 bg-gray-100 p-4">
-			<h4 className="font-semibold text-gray-700">Additional Information Provided:</h4>
+			<h4 className="font-semibold text-gray-700">{additionalAnswerDescription.en}</h4>
 			{displayFields.map((groupField, groupIndex) => (
 				<div
 					key={isReadOnly ? groupIndex : groupField.id}

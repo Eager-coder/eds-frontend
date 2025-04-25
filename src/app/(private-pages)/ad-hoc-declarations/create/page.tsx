@@ -79,7 +79,7 @@ export default function AdHocDeclarationForm() {
 					{
 						type: 'initial' as DecType,
 						id: initialDeclaration!.declarationId,
-						name: `DEC-${formatDeclId(initialDeclaration!.declarationId)}`
+						name: `DEC-${formatDeclId(initialDeclaration!.userDeclarationId)}`
 					}
 				]
 			: []),

@@ -88,9 +88,15 @@ export default function Page() {
 				<div className="min-w-max rounded-sm border border-zinc-200 bg-white p-6 shadow-sm">
 					<div className="grid grid-cols-1 gap-y-5">
 						<div>
-							<span className="block text-sm text-gray-500">Declaration</span>
+							<span className="block text-sm text-gray-500">Management Plan</span>
 							<p className="mt-1 border-b border-zinc-200 pb-2 text-base font-semibold text-gray-900">
-								DEC-{formatDeclId(plan.userDeclarationId || plan.adHocId)}
+								MP-{formatDeclId(planId)}
+							</p>
+						</div>
+						<div>
+							<span className="block text-sm text-gray-500">Created For</span>
+							<p className="mt-1 border-b border-zinc-200 pb-2 text-base font-semibold text-gray-900">
+								DEC-{formatDeclId(plan.userDeclarationId || plan.userAdHocDeclareId)}
 							</p>
 						</div>
 						<div>

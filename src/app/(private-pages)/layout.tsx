@@ -8,6 +8,8 @@ import { useUser } from '@/context/UserContext';
 import Link from 'next/link';
 import { Sidebar } from '@/components/Sidebar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { NotificationsSidebar } from '@/components/notification-sidebar';
+import { useState } from 'react';
 
 export default function RootLayout({
 	children
@@ -15,10 +17,14 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	const { user, isLoading } = useUser();
+	const [notificationsSidebarOpen, setNotificationsSidebarOpen] = useState(true);
 
 	return (
 		<>
-			<Navbar />
+			<Navbar
+				notificationsSidebarOpen={notificationsSidebarOpen}
+				setNotificationsSidebarOpen={setNotificationsSidebarOpen}
+			/>
 			<div className="flex">
 				<Sidebar />
 
@@ -35,6 +41,7 @@ export default function RootLayout({
 					children
 				)}
 			</div>
+			<NotificationsSidebar open={notificationsSidebarOpen} onOpenChange={setNotificationsSidebarOpen} />
 		</>
 	);
 }

@@ -12,7 +12,7 @@ export enum ManagementPlanStatus {
 export type ManagementPlanDto = {
 	id: number;
 	userDeclarationId: number;
-	adHocId: number;
+	userAdHocDeclareId: number;
 	creationDate: string;
 	createdBy: DeclarationUserDto;
 	status: ManagementPlanStatus;

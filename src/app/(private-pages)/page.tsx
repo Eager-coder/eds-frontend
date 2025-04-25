@@ -26,7 +26,7 @@ import Home from './home/page';
 export default function Dashboard() {
 	const router = useRouter();
 	const { user, isLoading } = useUser();
-	const [notificationsSidebarOpen, setNotificationsSidebarOpen] = useState(false);
+	const [notificationsSidebarOpen, setNotificationsSidebarOpen] = useState(true);
 	const { logout } = useUser();
 
 	useEffect(() => {
@@ -66,8 +66,9 @@ export default function Dashboard() {
 
 	return (
 		<div className="flex min-h-screen w-full flex-1 flex-col">
-			<div className="flex flex-1"><Home/></div>
-			<NotificationsSidebar open={notificationsSidebarOpen} onOpenChange={setNotificationsSidebarOpen} />
+			<div className="flex flex-1">
+				<Home />
+			</div>
 		</div>
 	);
 }

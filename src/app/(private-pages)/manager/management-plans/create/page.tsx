@@ -16,6 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { formatDeclId, formatDetailedDateTime, formatUserName } from '../../initial-declarations/[id]/page';
 import { UIDStatus } from '@/api-client/manager/getUserInitialDeclarations';
+import { useGetAdHocDeclare } from '@/api-client/user/ad-hoc-declarations/getAdHocDeclare';
 
 export default function Page() {
 	const router = useRouter();
@@ -33,6 +34,8 @@ export default function Page() {
 		userId: decId ?? 0,
 		enabled: !!user && !!decId
 	});
+
+	const { data: adHocDeclare } = useGetAdHocDeclare(adHocId!);
 
 	// Fetch available management actions
 	const { data: managementActions = [], isLoading: actionsLoading } = useGetManagementActions({
@@ -61,7 +64,7 @@ export default function Page() {
 	if (!user) {
 		return null; // already redirected
 	}
-	if (!declaration) {
+	if (!declaration && !adHocDeclare) {
 		return <div className="p-6 text-center text-red-500">Declaration not found.</div>;
 	}
 
@@ -75,8 +78,8 @@ export default function Page() {
 		const payload: CreateMangementPlanRequest = {
 			actionRequired,
 			// include exactly one of these
-			...(decId ? { userDeclarationId: declaration?.userDeclarationId } : {}),
-			...(adHocId ? { adHocId } : {}),
+			...(decId ? { userDeclarationId: declaration!.userDeclarationId! } : { userDeclarationId: null }),
+			...(adHocId ? { adHocDeclareId: adHocId } : { adHocDeclareId: null }),
 			// for the API, actionId and executionDate are required
 			actionId: actionRequired ? (actionId as number) : 0,
 			executionDate: actionRequired ? new Date(executionDate).toISOString() : new Date().toISOString(),
@@ -105,37 +108,37 @@ export default function Page() {
 						<div>
 							<span className="block text-sm text-gray-500">Number</span>
 							<p className="mt-1 border-b border-gray-300 pb-2 text-base font-semibold text-gray-900">
-								DEC-{formatDeclId(declaration.userDeclarationId)}
+								DEC-{formatDeclId(declaration?.userDeclarationId)}
 							</p>
 						</div>
 						<div>
 							<span className="block text-sm text-gray-500">Created by</span>
 							<p className="mt-1 border-b border-gray-300 pb-2 text-base font-semibold text-blue-600">
-								{formatUserName(declaration.createdBy)}
+								{formatUserName(declaration?.createdBy)}
 							</p>
 						</div>
 						<div>
 							<span className="block text-sm text-gray-500">Created on</span>
 							<p className="mt-1 border-b border-gray-300 pb-2 text-base font-semibold text-gray-900">
-								{formatDetailedDateTime(declaration.creationDate)}
+								{formatDetailedDateTime(declaration?.creationDate)}
 							</p>
 						</div>
 						<div>
 							<span className="block text-sm text-gray-500">Position/Manager</span>
 							<p className="mt-1 border-b border-gray-300 pb-2 text-base font-semibold text-gray-900">
-								{declaration.user?.position ?? 'N/A'}
+								{declaration?.user?.position ?? 'N/A'}
 							</p>
 						</div>
 						<div>
 							<span className="block text-sm text-gray-500">Department/Office/School</span>
 							<p className="mt-1 border-b border-gray-300 pb-2 text-base font-semibold text-gray-900">
-								{declaration.user?.department ?? 'N/A'}
+								{declaration?.user?.department ?? 'N/A'}
 							</p>
 						</div>
 						<div>
 							<span className="block text-sm text-gray-500">Status</span>
 							<p className="mt-1 border-b border-gray-300 pb-2 text-base font-semibold text-gray-900 capitalize last:border-b-0">
-								{declaration.status.toLowerCase()}
+								{declaration?.status.toLowerCase()}
 							</p>
 						</div>
 					</div>

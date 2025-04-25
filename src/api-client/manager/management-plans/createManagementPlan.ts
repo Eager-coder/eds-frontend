@@ -2,8 +2,8 @@ import { fetchClient } from '@/lib/client';
 import { ManagementPlanDto } from './getManagementPlanById';
 
 export type CreateMangementPlanRequest = {
-	userDeclarationId?: number;
-	adHocId?: number;
+	userDeclarationId: number | null;
+	adHocDeclareId: number | null;
 	actionRequired: boolean;
 	actionId: number;
 	actionDetails?: string;

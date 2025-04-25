@@ -1,17 +1,14 @@
-'use client';
-
+import React, { JSX, useState } from 'react';
 import { Clock, User } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useState } from 'react';
 import { useUser } from '@/context/UserContext';
 import { useGetNotifications } from '@/api-client/common/getNotifications';
+import Link from 'next/link';
+import { Label } from './ui/label';
 
 interface Task {
 	id: string;
@@ -28,42 +25,41 @@ interface NotificationsSidebarProps {
 	onOpenChange: (open: boolean) => void;
 }
 
+// Function to replace URLs with the Next.js Link component
+const replaceLinksWithComponent = (text: string, closeSidebar: () => void): JSX.Element[] => {
+	// Regular expression to find URLs
+	const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+	// Split the string by URLs and map the text and links
+	const parts = text.split(urlRegex);
+
+	return parts.map((part, index) => {
+		if (urlRegex.test(part)) {
+			// If the part is a URL, wrap it with the Link component and close the sidebar when clicked
+			return (
+				<Link className="text-orange-600" href={part} onClick={() => closeSidebar()} key={index} passHref>
+					Link
+				</Link>
+			);
+		} else {
+			// If the part is text, return it as normal
+			return <React.Fragment key={index}>{part}</React.Fragment>;
+		}
+	});
+};
+
 export function NotificationsSidebar({ open, onOpenChange }: NotificationsSidebarProps) {
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 	const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
 
 	const { user } = useUser();
-	const { data } = useGetNotifications(user?.email, {
+	const { data: tasks } = useGetNotifications(user?.email, {
 		enabled: !!user
 	});
 
-	console.log(data);
-	// Mock tasks data
-	const tasks: Task[] = [
-		{
-			id: '1',
-			title: 'Please check the initial declaration DEC-D2435',
-			subtitle: 'ЖЦД Декларации DEC-D2345',
-			timestamp: 'Today at 6:34 PM',
-			declarationId: 'DEC-00301',
-			startDate: '1/25/2024 6:02 PM',
-			dueDate: '1/25/2024 6:22 PM'
-		},
-		{
-			id: '2',
-			title: 'Please check the initial declaration DEC-D2435',
-			subtitle: 'ЖЦД Декларации DEC-D2345',
-			timestamp: 'Today at 6:34 PM',
-			declarationId: 'DEC-00302',
-			startDate: '1/25/2024 6:02 PM',
-			dueDate: '1/25/2024 6:22 PM'
-		}
-		// Add more mock tasks as needed
-	];
-
-	const handleTaskClick = (task: Task) => {
-		setSelectedTask(task);
-		setApprovalDialogOpen(true);
+	// Function to close the sidebar
+	const closeSidebar = () => {
+		onOpenChange(false);
 	};
 
 	return (
@@ -74,25 +70,27 @@ export function NotificationsSidebar({ open, onOpenChange }: NotificationsSideba
 						<SheetTitle>Business process tasks</SheetTitle>
 					</SheetHeader>
 					<div className="h-full overflow-y-auto pb-20">
-						{tasks.map((task) => (
-							<div
-								key={task.id}
-								className="cursor-pointer border-b p-4 hover:bg-gray-50"
-								onClick={() => handleTaskClick(task)}
-							>
-								<div className="flex items-start gap-3">
-									<User className="mt-1 h-5 w-5 text-gray-500" />
-									<div className="flex-1">
-										<div className="mb-1 flex items-center gap-2">
-											<Clock className="h-4 w-4 text-gray-500" />
-											<span className="text-sm text-gray-500">{task.timestamp}</span>
+						{tasks?.length ? (
+							tasks.map((task) => (
+								<div key={task.id} className="cursor-pointer border-b p-4 hover:bg-gray-50">
+									<div className="flex items-start gap-3">
+										<User className="mt-1 h-5 w-5 text-gray-500" />
+										<div className="flex-1">
+											<div className="mb-1 flex items-center gap-2">
+												<Clock className="h-4 w-4 text-gray-500" />
+												<span className="text-sm text-gray-500">{task.creationDate}</span>
+											</div>
+											<div className="break-all whitespace-pre-line">
+												{/* Pass the closeSidebar function to replaceLinksWithComponent */}
+												{replaceLinksWithComponent(task.description, closeSidebar)}
+											</div>
 										</div>
-										<p className="mb-1 text-[#DDAF53] hover:underline">{task.title}</p>
-										<p className="text-sm text-gray-500">{task.subtitle}</p>
 									</div>
 								</div>
-							</div>
-						))}
+							))
+						) : (
+							<i className="mt-4 block p-4">No notifications</i>
+						)}
 					</div>
 				</SheetContent>
 			</Sheet>

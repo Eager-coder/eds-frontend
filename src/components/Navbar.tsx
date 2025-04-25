@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { Button } from './ui/button';
 import { Bell, CircleUserRound, Settings } from 'lucide-react';
 import { Dispatch, SetStateAction } from 'react';
+import { useUser } from '@/context/UserContext';
+import { useGetNotifications } from '@/api-client/common/getNotifications';
 
 export function Navbar({
 	setNotificationsSidebarOpen,
@@ -13,6 +15,12 @@ export function Navbar({
 	setNotificationsSidebarOpen: Dispatch<SetStateAction<boolean>>;
 	notificationsSidebarOpen: boolean;
 }) {
+	const { user } = useUser();
+
+	const { data: tasks } = useGetNotifications(user?.email, {
+		enabled: !!user
+	});
+
 	return (
 		<header className="flex items-center justify-between border-b border-zinc-200 px-6 py-3">
 			<div className="flex items-center">
@@ -34,7 +42,7 @@ export function Navbar({
 					onClick={() => setNotificationsSidebarOpen((prev) => !prev)}
 				>
 					<div className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-yellow-500 text-xs text-white">
-						2
+						{tasks?.length ? tasks.length : null}
 					</div>
 					<Button variant="ghost" size="icon" className="text-gray-600">
 						{/* <Image

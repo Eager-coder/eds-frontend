@@ -29,13 +29,13 @@ export const getNotifications = async (email: string): Promise<NotificationDto[]
 export const useGetNotifications = (
 	email?: string,
 	options?: Omit<
-		UseQueryOptions<NotificationDto[], Error, NotificationDto[], ['notifications', string]>,
+		UseQueryOptions<NotificationDto[] | undefined, Error, NotificationDto[], ['notifications', string]>,
 		'queryKey' | 'queryFn'
 	>
 ) => {
-	return useQuery<NotificationDto[], Error, NotificationDto[], ['notifications', string]>({
+	return useQuery<NotificationDto[] | undefined, Error, NotificationDto[] | undefined, ['notifications', string]>({
 		queryKey: ['notifications', email || 'no-email'],
-		queryFn: email ? () => getNotifications(email) : undefined,
+		queryFn: email ? () => getNotifications(email) : () => Promise.resolve(undefined),
 		enabled: Boolean(email),
 		...options
 	});

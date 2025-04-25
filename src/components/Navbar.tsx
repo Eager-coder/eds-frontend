@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Bell, CircleUserRound, Settings } from 'lucide-react';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useUser } from '@/context/UserContext';
 import { useGetNotifications } from '@/api-client/common/getNotifications';
 
@@ -17,9 +17,19 @@ export function Navbar({
 }) {
 	const { user } = useUser();
 
-	const { data: tasks } = useGetNotifications(user?.email, {
+	const { data: tasks, refetch } = useGetNotifications(user?.email, {
 		enabled: !!user
 	});
+
+	// Refetch notifications every 3 seconds
+	useEffect(() => {
+		const intervalId = setInterval(() => {
+			refetch(); // This will call the refetch function every 3 seconds
+		}, 3000);
+
+		// Cleanup the interval when the component is unmounted or when the effect is re-run
+		return () => clearInterval(intervalId);
+	}, [refetch]);
 
 	return (
 		<header className="flex items-center justify-between border-b border-zinc-200 px-6 py-3">

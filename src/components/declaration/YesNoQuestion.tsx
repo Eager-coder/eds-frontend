@@ -39,7 +39,7 @@ export function YesNoQuestion({ question, questionIndex, isReadOnly = false }: P
 				)}
 			>
 				{question.orderNumber}. {question.description.en} {/* Add localization */}
-				{question.note && (
+				{question.note.en && (
 					<div className="mt-1 flex gap-2 rounded bg-sky-50/90 p-2 text-sm font-normal text-gray-700">
 						<Info width={20} height={20} className="text-sky-600" />
 						<p className="w-full flex-1">{question.note.en}</p>

@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useState } from 'react';
+import { useUser } from '@/context/UserContext';
+import { useGetNotifications } from '@/api-client/common/getNotifications';
 
 interface Task {
 	id: string;
@@ -30,6 +32,12 @@ export function NotificationsSidebar({ open, onOpenChange }: NotificationsSideba
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 	const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
 
+	const { user } = useUser();
+	const { data } = useGetNotifications(user?.email, {
+		enabled: !!user
+	});
+
+	console.log(data);
 	// Mock tasks data
 	const tasks: Task[] = [
 		{

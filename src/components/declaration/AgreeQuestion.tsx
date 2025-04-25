@@ -30,7 +30,7 @@ export function AgreeQuestion({ question, questionIndex, isReadOnly = false }: P
 				)}
 			>
 				{question.orderNumber}. {question.description.en} {/* Add localization */}
-				{question.note && <p className="mt-1 text-sm font-normal text-gray-500">{question.note.en}</p>}
+				{question.note.en && <p className="mt-1 text-sm font-normal text-gray-500">{question.note.en}</p>}
 			</FormLabel>
 
 			{isReadOnly ? (

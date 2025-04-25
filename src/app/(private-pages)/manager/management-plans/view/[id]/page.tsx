@@ -11,6 +11,8 @@ import {
 	ManagementPlanStatus,
 	useManagementPlanById
 } from '@/api-client/manager/management-plans/getManagementPlanById';
+import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
 
 export default function Page() {
 	const router = useRouter();
@@ -79,7 +81,20 @@ export default function Page() {
 
 				{/* Plan Details */}
 				<div className="flex-1 space-y-6 border border-zinc-200 bg-white p-6 shadow-sm">
-					<h1 className="text-xl font-semibold">Management Plan Details</h1>
+					<h1 className="text-xl font-semibold">
+						Management Plan Details
+						<div className="mb-4 flex justify-end">
+							{managementPlan.status === ManagementPlanStatus.AGREED ||
+							managementPlan.status === ManagementPlanStatus.REFUSED ? (
+								<Button
+									type="button"
+									className="flex w-max cursor-pointer items-center justify-center gap-2 rounded bg-[#DDAF53] px-3 py-2 text-white hover:bg-amber-600"
+								>
+									<Download /> Export PDF
+								</Button>
+							) : null}
+						</div>
+					</h1>
 
 					<div className="space-y-4">
 						<div className="flex items-center gap-3">

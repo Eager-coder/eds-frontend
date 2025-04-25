@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { AlertCircle, ArrowLeft } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Download } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
 import {
 	useUserInitialDeclaration,
@@ -215,6 +215,16 @@ export default function ManagerViewDeclarationPage() {
 						</div>
 					</div>
 				</div>
+				{declarationData.status === UIDStatus.NO_CONFLICT ||
+				declarationData.status === UIDStatus.ACTUAL_CONFLICT ||
+				declarationData.status === UIDStatus.PERCEIVED_CONFLICT ? (
+					<Button
+						type="button"
+						className="flex w-max cursor-pointer items-center justify-center gap-2 rounded bg-[#DDAF53] px-3 py-2 text-white hover:bg-amber-600"
+					>
+						<Download /> Export PDF
+					</Button>
+				) : null}
 				{hasConflict && !managementPlans?.length && (
 					<div className="space-y-3 rounded-sm border border-zinc-200 p-4">
 						<h2>Next steps:</h2>

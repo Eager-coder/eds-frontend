@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
-import { ArrowLeft, Check, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Check, AlertTriangle, Download } from 'lucide-react';
 import Link from 'next/link';
 import { updateAdHocDeclare } from '@/api-client/manager/ad-hoc-declarations/updateAdHocDeclare';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -125,7 +125,7 @@ export default function AdHocDeclarationManagerPage() {
 			{/* Back button */}
 			<Link
 				href="/manager/ad-hoc-declarations"
-				className="mb-4 inline-flex items-center text-blue-600 hover:underline"
+				className="mb-4 inline-flex items-center text-[#DDAF53] hover:underline"
 			>
 				<ArrowLeft className="mr-1" size={16} />
 				Back to declarations
@@ -188,7 +188,18 @@ export default function AdHocDeclarationManagerPage() {
 					</div>
 				</div>
 			</div>
-
+			<div className="mb-4 flex justify-end">
+				{declaration.status === AdHocStatus.NO_CONFLICT ||
+				declaration.status === AdHocStatus.ACTUAL_CONFLICT ||
+				declaration.status === AdHocStatus.PERCEIVED_CONFLICT ? (
+					<Button
+						type="button"
+						className="mt-6 flex w-max cursor-pointer items-center justify-center gap-2 rounded bg-[#DDAF53] px-3 py-2 text-white hover:bg-amber-600"
+					>
+						<Download /> Export PDF
+					</Button>
+				) : null}
+			</div>
 			{/* Main information card */}
 			<Card className="mb-6 border-zinc-200">
 				<CardHeader>

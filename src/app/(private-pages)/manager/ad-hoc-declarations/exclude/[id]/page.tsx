@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
-import { ArrowLeft, AlertTriangle, Check } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, Check, Download } from 'lucide-react';
 import { useGetAdHocExclude } from '@/api-client/user/ad-hoc-declarations/getAdHocExclide';
 import { updateAdHocExclude } from '@/api-client/manager/ad-hoc-declarations/updateAdHocExclude';
 import { formatDeclId } from '../../../initial-declarations/[id]/page';
@@ -89,7 +89,19 @@ export default function AdHocExcludeManagerPage() {
 
 			<Card className="w-full rounded border-zinc-200">
 				<CardHeader>
-					<CardTitle>Exclusion Details</CardTitle>
+					<CardTitle className="flex items-center justify-between">
+						Exclusion Details
+						{exclude.status === AdHocStatus.NO_CONFLICT ||
+						exclude.status === AdHocStatus.ACTUAL_CONFLICT ||
+						exclude.status === AdHocStatus.PERCEIVED_CONFLICT ? (
+							<Button
+								type="button"
+								className="flex w-max cursor-pointer items-center justify-center gap-2 rounded bg-[#DDAF53] px-3 py-2 text-white hover:bg-amber-600"
+							>
+								<Download /> Export PDF
+							</Button>
+						) : null}
+					</CardTitle>
 					<CardDescription>General info</CardDescription>
 				</CardHeader>
 				<CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">

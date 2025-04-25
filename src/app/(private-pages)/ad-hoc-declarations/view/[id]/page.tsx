@@ -8,8 +8,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { format } from 'date-fns';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Download } from 'lucide-react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export default function AdHocDeclarationDetailPage() {
 	const router = useRouter();
@@ -70,7 +71,7 @@ export default function AdHocDeclarationDetailPage() {
 	return (
 		<div className="w-full flex-1 p-6">
 			{/* Back button */}
-			<Link href="/ad-hoc-declarations" className="mb-4 inline-flex items-center text-blue-600 hover:underline">
+			<Link href="/ad-hoc-declarations" className="mb-4 inline-flex items-center text-[#DDAF53] hover:underline">
 				<ArrowLeft className="mr-1" size={16} />
 				Back to declarations
 			</Link>
@@ -83,7 +84,19 @@ export default function AdHocDeclarationDetailPage() {
 			{/* Main information card */}
 			<Card className="mb-6 rounded-sm border-zinc-200 shadow-none">
 				<CardHeader>
-					<CardTitle>Declaration Details</CardTitle>
+					<CardTitle className="flex items-center justify-between">
+						Declaration Details
+						{declaration.status === AdHocStatus.NO_CONFLICT ||
+						declaration.status === AdHocStatus.ACTUAL_CONFLICT ||
+						declaration.status === AdHocStatus.PERCEIVED_CONFLICT ? (
+							<Button
+								type="button"
+								className="flex w-max cursor-pointer items-center justify-center gap-2 rounded bg-[#DDAF53] px-3 py-2 text-white hover:bg-amber-600"
+							>
+								<Download /> Export PDF
+							</Button>
+						) : null}
+					</CardTitle>
 					<CardDescription>General information about this declaration</CardDescription>
 				</CardHeader>
 				<CardContent>

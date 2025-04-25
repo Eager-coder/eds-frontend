@@ -51,10 +51,9 @@ export default function Register() {
 			const payload: RegisterRequestDto = { ...data, role: 'USER' };
 			const response: RegisterResponseDto = await registerUser(payload);
 			console.log('Registration successful:', response);
-			if (typeof window !== 'undefined') {
-				localStorage.setItem('access_token', response.access_token);
-				localStorage.setItem('refresh_token', response.refresh_token);
-			}
+
+			localStorage.setItem('access_token', response.access_token);
+			localStorage.setItem('refresh_token', response.refresh_token);
 
 			// Update user context with the user data from response
 			setUser({

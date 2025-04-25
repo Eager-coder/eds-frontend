@@ -17,7 +17,7 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	const { user, isLoading } = useUser();
-	const [notificationsSidebarOpen, setNotificationsSidebarOpen] = useState(true);
+	const [notificationsSidebarOpen, setNotificationsSidebarOpen] = useState(false);
 
 	return (
 		<>

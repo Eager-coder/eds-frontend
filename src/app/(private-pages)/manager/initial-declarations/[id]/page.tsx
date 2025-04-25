@@ -53,14 +53,7 @@ export const formatUserName = (user: UIDResponse['user'] | null | undefined): st
 export default function ManagerViewDeclarationPage() {
 	const router = useRouter();
 	const params = useParams();
-	const targetUserIdParam = params.id; // This will be a string or string[]
-
-	// Ensure targetUserId is a valid number
-	const targetUserId = React.useMemo(() => {
-		const id = Array.isArray(targetUserIdParam) ? targetUserIdParam[0] : targetUserIdParam;
-		const numId = Number(id);
-		return !isNaN(numId) && numId > 0 ? numId : null;
-	}, [targetUserIdParam]);
+	const userId = Number(params.id); // This will be a string or string[]
 
 	const { isLoading: isUserLoading, user: managerUser } = useUser();
 
@@ -70,15 +63,11 @@ export default function ManagerViewDeclarationPage() {
 		isLoading: isDeclarationLoading,
 		refetch
 	} = useUserInitialDeclaration({
-		userId: targetUserId!,
-		enabled:
-			!isUserLoading &&
-			!!managerUser &&
-			(managerUser.role === 'MANAGER' || managerUser.role === 'ADMIN' || managerUser.role === 'SUPER_ADMIN') &&
-			!!targetUserId
+		userId: userId!,
+		enabled: !!userId
 	});
 
-	const { data: managementPlans } = useGetUIDManagementPlans(declarationData?.declarationId, {
+	const { data: managementPlans } = useGetUIDManagementPlans(declarationData?.user.id, {
 		enabled: Boolean(declarationData?.declarationId)
 	});
 
@@ -86,11 +75,11 @@ export default function ManagerViewDeclarationPage() {
 		defaultValues: { questions: [] }
 	});
 
-	const combinedLoading = isUserLoading || (!!targetUserId && isDeclarationLoading);
-
+	const combinedLoading = isUserLoading || (!!userId && isDeclarationLoading);
+	console.log(declarationData);
 	const handleStatusUpdate = async () => {
 		if (declarationData && statusToUpdate) {
-			await updateUIDStatus(declarationData.declarationId, statusToUpdate);
+			await updateUIDStatus(declarationData.userDeclarationId, statusToUpdate);
 			await refetch();
 		}
 	};
@@ -121,7 +110,7 @@ export default function ManagerViewDeclarationPage() {
 		);
 	}
 
-	if (!targetUserId) {
+	if (!userId) {
 		return (
 			<div className="p-6 text-center text-red-500">
 				<h1 className="text-xl font-semibold">Invalid User ID</h1>
@@ -230,7 +219,7 @@ export default function ManagerViewDeclarationPage() {
 					<div className="space-y-3 rounded-sm border border-zinc-200 p-4">
 						<h2>Next steps:</h2>
 						<Link
-							href={`/manager/management-plans/create?decId=${declarationData.declarationId}`}
+							href={`/manager/management-plans/create?decId=${declarationData.user.id}`}
 							className="rounded-sm bg-[#DDAF53] px-3 py-2 text-white hover:bg-amber-700"
 						>
 							Create management plan
@@ -238,7 +227,7 @@ export default function ManagerViewDeclarationPage() {
 					</div>
 				)}
 
-				{managementPlans && (
+				{managementPlans?.length ? (
 					<div className="rounded-sm border border-zinc-200 p-4">
 						<h3>Management plans:</h3>
 						{managementPlans?.map((mp, index) => (
@@ -254,7 +243,7 @@ export default function ManagerViewDeclarationPage() {
 							</ol>
 						))}
 					</div>
-				)}
+				) : null}
 
 				<div className="flex min-h-[400px] flex-1 gap-4">
 					<div className="min-w-max rounded-sm border border-gray-200 bg-white p-6 shadow-sm">

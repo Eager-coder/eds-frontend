@@ -23,6 +23,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { UIDStatus } from '@/api-client/manager/getUserInitialDeclarations';
 import { formatDetailedDateTime, formatUserName } from '../manager/initial-declarations/[id]/page';
 import { cn } from '@/lib/utils';
+import { Download } from 'lucide-react';
+import { fetchClient } from '@/lib/client';
 
 function formatDeclId(id: number | undefined): string {
 	return id?.toString().padStart(5, '0') ?? 'N/A';
@@ -149,6 +151,17 @@ export default function Page() {
 
 		defaultValues: { questions: [] }
 	});
+
+	const downloadFile = async () => {
+		const response = await fetchClient(`/export/initial-declaration/${declarationData?.userDeclarationId}/pdf`);
+		console.log(response);
+		// Read it as a Blob
+		const blob = await response.blob();
+		const url = URL.createObjectURL(blob);
+
+		// 1) Open in a new tab:
+		window.open(url, '_blank');
+	};
 
 	useEffect(() => {
 		if (declarationData) {
@@ -361,6 +374,19 @@ export default function Page() {
 								{form.formState.errors.root.serverError.message}
 							</p>
 						)}
+						{declarationData.status === UIDStatus.NO_CONFLICT ||
+						declarationData.status === UIDStatus.ACTUAL_CONFLICT ||
+						declarationData.status === UIDStatus.PERCEIVED_CONFLICT ? (
+							<a
+								// href={`http://localhost:8080/api/v1`}
+								onClick={downloadFile}
+								target="_blank"
+								type="submit"
+								className="mt-6 flex w-max items-center justify-center gap-2 rounded bg-[#DDAF53] px-3 py-2 text-white hover:bg-amber-600"
+							>
+								<Download /> Export PDF
+							</a>
+						) : null}
 
 						{declarationData.status === UIDStatus.CREATED && (
 							<Button type="submit" disabled={isSubmitting} className="bg-amber-500 hover:bg-amber-600">

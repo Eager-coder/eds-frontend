@@ -27,8 +27,6 @@ export function useGetAdHocStatements(
 	return useQuery({
 		queryKey: AD_HOC_STATEMENTS,
 		queryFn: getAdHocStatements,
-		staleTime: 1000 * 60 * 5,
-		retry: 1,
 		...options
 	});
 }

@@ -75,7 +75,7 @@ export default function Page() {
 		const payload: CreateMangementPlanRequest = {
 			actionRequired,
 			// include exactly one of these
-			...(decId ? { userDeclarationId: decId } : {}),
+			...(decId ? { userDeclarationId: declaration?.userDeclarationId } : {}),
 			...(adHocId ? { adHocId } : {}),
 			// for the API, actionId and executionDate are required
 			actionId: actionRequired ? (actionId as number) : 0,
@@ -85,8 +85,8 @@ export default function Page() {
 
 		try {
 			const created = await createMangementPlan(payload);
-			// redirect to the newly created management plan page
-			// router.push(`/manager/management-plans/${created.id}`);
+
+			router.push(`/manager/management-plans/view/${created.id}`);
 		} catch (err: unknown) {
 			const msg = err instanceof Error ? err.message : 'Unknown error';
 			console.error(err);
@@ -227,7 +227,11 @@ export default function Page() {
 							</div>
 						)}
 
-						<Button type="submit" disabled={actionRequired && (!actionId || !executionDate)}>
+						<Button
+							className="mt-2 cursor-pointer rounded-sm bg-[#DDAF53] text-white hover:bg-amber-600"
+							type="submit"
+							disabled={actionRequired && (!actionId || !executionDate)}
+						>
 							Save Management Plan
 						</Button>
 					</form>

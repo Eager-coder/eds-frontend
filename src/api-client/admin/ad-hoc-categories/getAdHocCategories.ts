@@ -31,8 +31,7 @@ export function useGetAdHocCategories(
 	return useQuery({
 		queryKey: AD_HOC_CATEGORIES,
 		queryFn: getAdHocCategories,
-		staleTime: 1000 * 60 * 5,
-		retry: 1,
+
 		...options
 	});
 }

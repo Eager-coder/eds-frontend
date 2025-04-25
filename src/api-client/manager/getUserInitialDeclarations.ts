@@ -74,7 +74,6 @@ export function useUserInitialDeclarations(
 	>({
 		queryFn: getUserInitialDeclarations,
 		queryKey: USER_INITIAL_DECLARATIONS_LIST_QUERY_KEY,
-		retry: 1,
 		...options
 	});
 }

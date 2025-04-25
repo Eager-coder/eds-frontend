@@ -1,4 +1,5 @@
 import {
+	initialDeclarationKeys,
 	InitialDeclarationQuestionDto,
 	InitialDeclarationQuestionOptionDto
 } from '@/api-client/admin/initial-declarations/getInitialDeclarationById';
@@ -6,6 +7,10 @@ import AddOptionDialog from './AddOptionDialog';
 import { Badge } from '@/components/ui/badge';
 import { QuestionType } from '@/api-client/admin/initial-declarations/questions/createQuestion';
 import { Option } from './Option';
+import { Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { deleteDeclarationQuestion } from '@/api-client/admin/initial-declarations/questions/deleteQuestion';
+import { queryClient } from '@/app/layout';
 
 interface Props {
 	q: InitialDeclarationQuestionDto;
@@ -14,8 +19,24 @@ interface Props {
 }
 
 export function Question({ q, onUpdate }: Props) {
+	const handleDelete = async () => {
+		await deleteDeclarationQuestion(q.id);
+		queryClient.invalidateQueries({
+			queryKey: initialDeclarationKeys.all
+		});
+		if (onUpdate) {
+			onUpdate();
+		}
+	};
 	return (
-		<div key={q.id} className="space-y-4 rounded-lg border p-4">
+		<div key={q.id} className="relative space-y-4 rounded-lg border p-4">
+			<Button
+				onClick={handleDelete}
+				className="absolute top-2 right-2 cursor-pointer text-red-500 hover:text-red-700"
+				variant={'outline'}
+			>
+				<Trash2 />
+			</Button>
 			<div className="flex items-center gap-4 font-semibold">
 				<span className="text-xl">#{q.orderNumber}</span>
 				{q.isRequired ? (

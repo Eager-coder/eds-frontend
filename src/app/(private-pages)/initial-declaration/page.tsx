@@ -377,15 +377,13 @@ export default function Page() {
 						{declarationData.status === UIDStatus.NO_CONFLICT ||
 						declarationData.status === UIDStatus.ACTUAL_CONFLICT ||
 						declarationData.status === UIDStatus.PERCEIVED_CONFLICT ? (
-							<a
-								// href={`http://localhost:8080/api/v1`}
+							<Button
 								onClick={downloadFile}
-								target="_blank"
-								type="submit"
-								className="mt-6 flex w-max items-center justify-center gap-2 rounded bg-[#DDAF53] px-3 py-2 text-white hover:bg-amber-600"
+								type="button"
+								className="mt-6 flex w-max cursor-pointer items-center justify-center gap-2 rounded bg-[#DDAF53] px-3 py-2 text-white hover:bg-amber-600"
 							>
 								<Download /> Export PDF
-							</a>
+							</Button>
 						) : null}
 
 						{declarationData.status === UIDStatus.CREATED && (

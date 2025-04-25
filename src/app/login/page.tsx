@@ -56,7 +56,7 @@ export default function LoginPage() {
 				registrationDate: response.user.registrationDate
 			});
 
-			router.push(`/profile`);
+			router.push(`/`);
 		} catch (err) {
 			form.setError('password', {
 				type: 'manual',

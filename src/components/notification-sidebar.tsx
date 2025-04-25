@@ -9,6 +9,7 @@ import { useUser } from '@/context/UserContext';
 import { useGetNotifications } from '@/api-client/common/getNotifications';
 import Link from 'next/link';
 import { Label } from './ui/label';
+import { format } from 'date-fns';
 
 interface Task {
 	id: string;
@@ -37,7 +38,13 @@ const replaceLinksWithComponent = (text: string, closeSidebar: () => void): JSX.
 		if (urlRegex.test(part)) {
 			// If the part is a URL, wrap it with the Link component and close the sidebar when clicked
 			return (
-				<Link className="text-orange-600" href={part} onClick={() => closeSidebar()} key={index} passHref>
+				<Link
+					className="font-bold text-orange-600 underline"
+					href={part}
+					onClick={() => closeSidebar()}
+					key={index}
+					passHref
+				>
 					Link
 				</Link>
 			);
@@ -72,15 +79,17 @@ export function NotificationsSidebar({ open, onOpenChange }: NotificationsSideba
 					<div className="h-full overflow-y-auto pb-20">
 						{tasks?.length ? (
 							tasks.map((task) => (
-								<div key={task.id} className="cursor-pointer border-b p-4 hover:bg-gray-50">
+								<div key={task.id} className="cursor-pointer border-b p-4">
 									<div className="flex items-start gap-3">
 										<User className="mt-1 h-5 w-5 text-gray-500" />
 										<div className="flex-1">
 											<div className="mb-1 flex items-center gap-2">
 												<Clock className="h-4 w-4 text-gray-500" />
-												<span className="text-sm text-gray-500">{task.creationDate}</span>
+												<span className="text-sm text-gray-500">
+													{format(new Date(task.creationDate), 'yyyy-MM-dd HH:mm')}
+												</span>
 											</div>
-											<div className="break-all whitespace-pre-line">
+											<div className="text-sm break-all whitespace-pre-line text-[#e89804] hover:underline">
 												{/* Pass the closeSidebar function to replaceLinksWithComponent */}
 												{replaceLinksWithComponent(task.description, closeSidebar)}
 											</div>

@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { updateUIDStatus } from '@/api-client/manager/initial-declarations/updateUIDStatus';
 import { useGetUIDManagementPlans } from '@/api-client/common/getUIDManagementPlans';
 import { Badge } from '@/components/ui/badge';
+import { fetchClient } from '@/lib/client';
 
 export function formatDeclId(id: number | undefined): string {
 	return id?.toString().padStart(5, '0') ?? 'N/A';
@@ -56,6 +57,16 @@ export default function ManagerViewDeclarationPage() {
 	const userId = Number(params.id); // This will be a string or string[]
 
 	const { isLoading: isUserLoading, user: managerUser } = useUser();
+	const downloadFile = async () => {
+		const response = await fetchClient(`/export/initial-declaration/${declarationData?.userDeclarationId}/pdf`);
+		console.log(response);
+		// Read it as a Blob
+		const blob = await response.blob();
+		const url = URL.createObjectURL(blob);
+
+		// 1) Open in a new tab:
+		window.open(url, '_blank');
+	};
 
 	// Fetch data using the manager-specific hook
 	const {
@@ -220,6 +231,7 @@ export default function ManagerViewDeclarationPage() {
 				declarationData.status === UIDStatus.PERCEIVED_CONFLICT ? (
 					<Button
 						type="button"
+						onClick={downloadFile}
 						className="flex w-max cursor-pointer items-center justify-center gap-2 rounded bg-[#DDAF53] px-3 py-2 text-white hover:bg-amber-600"
 					>
 						<Download /> Export PDF

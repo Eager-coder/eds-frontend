@@ -1,7 +1,8 @@
 import { fetchClient } from '@/lib/client';
 
 export const deleteOption = async (id: number) => {
-	const response = await fetchClient(`/initial-declarations/additional-options/${id}`, {
+	// F
+	const response = await fetchClient(`/initial-declarations/options/${id}`, {
 		method: 'DELETE'
 	});
 	if (!response.ok) {

@@ -68,7 +68,7 @@ export default function ManagerViewDeclarationPage() {
 	});
 
 	const { data: managementPlans } = useGetUIDManagementPlans(declarationData?.user.id, {
-		enabled: Boolean(declarationData?.declarationId)
+		enabled: Boolean(declarationData?.userDeclarationId)
 	});
 
 	const formMethods = useForm<DeclarationAnswersFormValues>({
@@ -261,7 +261,7 @@ export default function ManagerViewDeclarationPage() {
 							<div>
 								<span className="block text-sm text-gray-500">Number</span>
 								<p className="mt-1 border-b border-gray-300 pb-2 text-base font-semibold text-gray-900">
-									DEC-{formatDeclId(declarationData?.declarationId)}
+									DEC-{formatDeclId(declarationData?.userDeclarationId)}
 								</p>
 							</div>
 

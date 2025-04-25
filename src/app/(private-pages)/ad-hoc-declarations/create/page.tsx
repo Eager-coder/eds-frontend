@@ -53,7 +53,7 @@ export default function AdHocDeclarationForm() {
 	});
 
 	// Determine availability of previous declarations
-	const hasInitial = (initialDeclaration?.declarationId || 0) > 0;
+	const hasInitial = (initialDeclaration?.userDeclarationId || 0) > 0;
 	const hasAdHoc = (adHocDeclares ?? []).length > 0;
 	const hasPreviousDeclarations = hasInitial || hasAdHoc;
 
@@ -78,7 +78,7 @@ export default function AdHocDeclarationForm() {
 			? [
 					{
 						type: 'initial' as DecType,
-						id: initialDeclaration!.declarationId,
+						id: initialDeclaration!.userDeclarationId,
 						name: `DEC-${formatDeclId(initialDeclaration!.userDeclarationId)}`
 					}
 				]

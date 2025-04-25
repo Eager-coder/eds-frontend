@@ -105,7 +105,7 @@ export default function Page() {
 						<div>
 							<span className="block text-sm text-gray-500">Number</span>
 							<p className="mt-1 border-b border-gray-300 pb-2 text-base font-semibold text-gray-900">
-								DEC-{formatDeclId(declaration.declarationId)}
+								DEC-{formatDeclId(declaration.userDeclarationId)}
 							</p>
 						</div>
 						<div>

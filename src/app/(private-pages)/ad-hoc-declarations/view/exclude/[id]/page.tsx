@@ -46,7 +46,7 @@ export default function AdHocExcludeViewPage() {
 	};
 
 	const isInitial = Boolean(exclude.userInitialDeclaration);
-	const declId = isInitial ? exclude.userInitialDeclaration!.declarationId : exclude.userAdHocDeclare!.id;
+	const declId = isInitial ? exclude.userInitialDeclaration!.id : exclude.userAdHocDeclare!.id;
 	const declName = isInitial ? exclude.userInitialDeclaration!.declarationTitle : `Ad-hoc #${declId}`;
 
 	return (

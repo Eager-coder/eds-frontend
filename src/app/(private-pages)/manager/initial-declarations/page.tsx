@@ -99,7 +99,7 @@ export default function UserDeclarationsListPage() {
 									onClick={() => router.push(`/manager/initial-declarations/${decl.user.id}`)}
 								>
 									<td className="border-b border-zinc-200 px-4 py-3 font-medium">
-										DEC-{formatDeclId(decl.declarationId)}
+										DEC-{formatDeclId(decl.id)}
 									</td>
 									<td className="border-b border-zinc-200 px-4 py-3 font-medium">
 										{formatUserName(decl.user)}

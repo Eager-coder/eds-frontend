@@ -127,7 +127,7 @@ export default function Page() {
 								{adHocExcludes.map((excl) => {
 									const isInitial = Boolean(excl.userInitialDeclaration);
 									const declId = isInitial
-										? excl.userInitialDeclaration!.declarationId
+										? excl.userInitialDeclaration!.id
 										: excl.userAdHocDeclare!.id;
 									const name = isInitial
 										? `DEC-${formatDeclId(declId)}`

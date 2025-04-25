@@ -1,11 +1,14 @@
 import {
 	InitialDeclarationAdditionalOptionDto,
+	initialDeclarationKeys,
 	InitialDeclarationQuestionOptionDto
 } from '@/api-client/admin/initial-declarations/getInitialDeclarationById';
 import { QuestionType } from '@/api-client/admin/initial-declarations/questions/createQuestion';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { AdditionalOptionModal } from './AdditionalOptionModal';
+import { deleteOption } from '@/api-client/admin/initial-declarations/options/deleteOption';
+import { queryClient } from '@/app/layout';
 
 interface Props {
 	option: InitialDeclarationQuestionOptionDto;
@@ -15,8 +18,25 @@ interface Props {
 }
 
 export function Option({ option, index, questionType, onAdd }: Props) {
+	const handleDelete = async () => {
+		await deleteOption(option.id);
+		queryClient.invalidateQueries({
+			queryKey: initialDeclarationKeys.all
+		});
+		if (onAdd) {
+			onAdd();
+		}
+	};
+
 	return (
-		<div className="space-y-4 rounded-lg border-[0.5px] border-gray-700 bg-zinc-100 p-4">
+		<div className="relative space-y-4 rounded-lg border-[0.5px] border-gray-700 bg-zinc-100 p-4">
+			<Button
+				onClick={handleDelete}
+				className="absolute top-2 right-2 cursor-pointer text-red-500 hover:text-red-700"
+				variant={'outline'}
+			>
+				<Trash2 />
+			</Button>
 			<h4 className="mb-2 font-bold">Option # {index + 1}</h4>
 			<p className="mb-2 font-semibold">Option Description:</p>
 			<ul className="space-y-2 rounded-lg border-[0.5px] border-gray-700 bg-amber-50/45 p-4 text-gray-800">
